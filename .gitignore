@@ -1,0 +1,7 @@
+# Do not commit these
+.terraform
+*.tfstate
+
+# non-standard location to put credentials
+.credentials
+ 
