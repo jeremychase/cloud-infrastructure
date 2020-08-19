@@ -1,7 +1,3 @@
-locals {
-  s3_origin_id = "S3Bucket" # BUG(medium) maybe change name
-}
-
 resource "aws_s3_bucket" "www_jeremychase_io_logs" {
   bucket = "logs-www.jeremychase.io" # BUG(medium) change name
   acl    = "private"
@@ -37,6 +33,10 @@ resource "aws_s3_bucket_public_access_block" "www_jeremychase_io_logs" {
   block_public_policy     = true
   ignore_public_acls      = true
   restrict_public_buckets = true
+}
+
+locals {
+  s3_origin_id = aws_s3_bucket.www_jeremychase_io.bucket_regional_domain_name
 }
 
 resource "aws_cloudfront_origin_access_identity" "oai" {
