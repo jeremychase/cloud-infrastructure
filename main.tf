@@ -1,4 +1,4 @@
-# BUG (medium) Update to terraform 0.13
+# BUG(medium) Update to terraform 0.13
 
 terraform {
   # BUG(medium) no locking
