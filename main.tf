@@ -9,7 +9,7 @@ terraform {
   }
 
   required_providers {
-    aws    = "~> 2.48" # BUG(medium) update
+    aws    = "3.2.0"
     google = "~> 3.9"
   }
 }
@@ -92,3 +92,5 @@ resource "aws_route53_record" "gcp_jeremychase_io_cname" {
   ttl  = 300
   type = "CNAME"
 }
+
+# BUG(medium) cloudwatch logs retention for everything

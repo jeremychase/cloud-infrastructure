@@ -47,4 +47,18 @@ Then:
 
 ```
 $ terraform init
+$ zip subdomain_redirect subdomain_redirect.py && time terraform apply -auto-approve
 ```
+
+## References
+
+https://aws.amazon.com/blogs/networking-and-content-delivery/lambdaedge-design-best-practices/
+https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-examples.html
+https://docs.aws.amazon.com/codepipeline/latest/userguide/reference-pipeline-structure.html
+https://docs.aws.amazon.com/codepipeline/latest/userguide/tutorials-s3deploy.html
+https://medium.com/@jeffreyrussom/react-continuous-deployments-with-aws-codepipeline-f5034129ff0e
+https://medium.com/swlh/create-deploy-a-serverless-react-app-to-s3-cloudfront-on-aws-4f83fa605ff0
+https://github.com/aws-samples/aws-codebuild-samples/blob/master/cloudformation/continuous-deployment.yml
+https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html#build-spec.artifacts
+https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-GitHub.html
+
