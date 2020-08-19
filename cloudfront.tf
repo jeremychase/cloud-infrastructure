@@ -2,10 +2,6 @@ locals {
   s3_origin_id = "S3Bucket" # BUG(medium) maybe change name
 }
 
-# BUG convert TODO into BUG comments
-
-# BUG(high) set storage class
-# BUG(high) enable lifecycle
 resource "aws_s3_bucket" "www_jeremychase_io_logs" {
   bucket = "logs-www.jeremychase.io" # BUG(medium) change name
   acl    = "private"
@@ -19,7 +15,7 @@ resource "aws_s3_bucket" "www_jeremychase_io_logs" {
     enabled = true
 
     transition {
-      days          = 0 # BUG(high) check
+      days          = 0 # BUG(medium) check
       storage_class = "INTELLIGENT_TIERING"
     }
   }
@@ -29,7 +25,7 @@ resource "aws_s3_bucket" "www_jeremychase_io_logs" {
     enabled = true
 
     expiration {
-      days = 365 # BUG(high) check
+      days = 365 # BUG(medium) check
     }
   }
 }
@@ -47,9 +43,9 @@ resource "aws_cloudfront_origin_access_identity" "oai" {
   comment = "www.jeremychase.io"
 }
 
-# TODO redirect from www to apex
+# BUG(high) redirect from www to apex
 # BUG(high) go through every line
-resource "aws_cloudfront_distribution" "s3_distribution" { # TODO(high) rename
+resource "aws_cloudfront_distribution" "s3_distribution" { # BUG(high) medium
   origin {
     domain_name = aws_s3_bucket.www_jeremychase_io.bucket_regional_domain_name
     origin_id   = local.s3_origin_id
@@ -61,13 +57,13 @@ resource "aws_cloudfront_distribution" "s3_distribution" { # TODO(high) rename
 
   enabled             = true
   is_ipv6_enabled     = true
-  comment             = "Some comment" # TODO(high) update
+  comment             = "Some comment" # BUG(high) update
   default_root_object = "index.html"
 
-  logging_config { # TODO(high) fix
+  logging_config { # BUG(high) fix
     include_cookies = false
     bucket          = aws_s3_bucket.www_jeremychase_io_logs.bucket_domain_name
-    prefix          = "myprefix" # TODO(high) update
+    prefix          = "myprefix" # BUG(high) update
   }
 
   aliases = ["jeremychase.io", "www.jeremychase.io"]
@@ -87,8 +83,8 @@ resource "aws_cloudfront_distribution" "s3_distribution" { # TODO(high) rename
 
     viewer_protocol_policy = "redirect-to-https"
     min_ttl                = 0
-    default_ttl            = 3600  # TODO(high) increase
-    max_ttl                = 86400 # TODO(high) increase
+    default_ttl            = 3600  # BUG(low) increase
+    max_ttl                = 86400 # BUG(low) increase
   }
 
   # Cache behavior with precedence 0

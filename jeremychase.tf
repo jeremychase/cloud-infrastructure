@@ -1,5 +1,4 @@
 
-# BUG(high) set storage class
 resource "aws_s3_bucket" "www_jeremychase_io" {
   bucket = "www.jeremychase.io"
   acl    = "private"
@@ -13,7 +12,7 @@ resource "aws_s3_bucket" "www_jeremychase_io" {
     enabled = true
 
     transition {
-      days          = 1 # BUG(high) check
+      days          = 1 # BUG(medium) check
       storage_class = "INTELLIGENT_TIERING"
     }
   }
@@ -28,7 +27,6 @@ resource "aws_s3_bucket_public_access_block" "www_jeremychase_io" {
   restrict_public_buckets = true
 }
 
-# BUG(high) set storage class
 resource "aws_s3_bucket" "www_jeremychase_io_codepipeline_bucket" {
   bucket = "codepipeline-www.jeremychase.io"
   acl    = "private"
@@ -39,7 +37,7 @@ resource "aws_s3_bucket" "www_jeremychase_io_codepipeline_bucket" {
 
     # Remove objects
     expiration {
-      days = 7 # BUG(high) verify
+      days = 7 # BUG(medium) verify
     }
   }
 }
@@ -97,22 +95,21 @@ data "aws_iam_policy" "CloudWatchLogsFullAccess" {
   arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
 }
 
-# TODO(jchase) too broad
-# TODO(jchase) wrong resource name
+# BUG(medium) too broad
+# BUG(high) wrong resource name
 resource "aws_iam_role_policy_attachment" "sto-readonly-role-policy-attach" {
   role       = aws_iam_role.codebuild.name
   policy_arn = data.aws_iam_policy.CloudWatchLogsFullAccess.arn
 }
 
-# TODO(jchase) too broad
-# TODO(jchase) poor resource name
+# BUG(medium) too broad
+# BUG(medium) poor resource name
 resource "aws_iam_role_policy_attachment" "s3_bucket_policy_attach" {
   role       = aws_iam_role.codebuild.name
   policy_arn = aws_iam_policy.s3_bucket_policy.arn
 }
 
 
-# TODO(jchase) consider module version https://registry.terraform.io/modules/tmknom/codebuild/aws/1.2.0
 resource "aws_codebuild_project" "www_jeremychase_io" {
   name           = "www-jeremychase-io"
   description    = "Build www.jeremychase.io"
@@ -140,7 +137,7 @@ resource "aws_codebuild_project" "www_jeremychase_io" {
   source {
     type = "CODEPIPELINE"
 
-    # TODO(jchase) possibly replace with https://github.com/terraform-providers/terraform-provider-aws/issues/5101#issuecomment-496663099
+    # BUG(medium) possibly replace with https://github.com/terraform-providers/terraform-provider-aws/issues/5101#issuecomment-496663099
     buildspec = <<BUILDSPEC
 version: 0.2
 
@@ -171,7 +168,7 @@ resource "aws_codepipeline" "www_jeremychase_io" {
     location = aws_s3_bucket.www_jeremychase_io_codepipeline_bucket.bucket
     type     = "S3"
 
-    # TODO(jchase) fix
+    # BUG(high) fix
     # encryption_key {
     #   id   = data.aws_kms_alias.s3kmskey.arn
     #   type = "KMS"
@@ -193,7 +190,7 @@ resource "aws_codepipeline" "www_jeremychase_io" {
         Owner      = "JeremyChase"
         Repo       = "www.jeremychase.io"
         Branch     = "master"
-        OAuthToken = var.github_token
+        OAuthToken = var.github_token # BUG(medium) determine required permissions https://github.com/settings/tokens
       }
     }
   }
@@ -230,7 +227,6 @@ resource "aws_codepipeline" "www_jeremychase_io" {
       configuration = {
         BucketName = aws_s3_bucket.www_jeremychase_io.id
         Extract    = "true"
-        # ObjectKey  = "bar" # TODO(jchase) fix
       }
     }
   }
@@ -258,8 +254,8 @@ EOF
 
 }
 
-# TODO(jchase) this is duplicated
-# TODO(jchase) poor resource name
+# BUG(high) this is duplicated
+# BUG(medium) poor resource name
 resource "aws_iam_policy" "s3_bucket_policy" {
   name = "s3_bucket_policy"
 
@@ -322,7 +318,7 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
 EOF
 }
 
-# TODO(jchase) fix
+# BUG(high) fix
 # data "aws_kms_alias" "s3kmskey" {
 #   name = "alias/myKmsKey"
 # }

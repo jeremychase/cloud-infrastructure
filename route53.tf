@@ -23,7 +23,7 @@ resource "aws_route53_zone" "jeremychase_io" {
 #  https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/acm_certificate_validation
 #
 # 
-resource "aws_route53_record" "jeremychase_io" { # TODO(jchase) rename 'validation'
+resource "aws_route53_record" "jeremychase_io" { # BUG(medium) rename 'validation'
   for_each = {
     for dvo in aws_acm_certificate.jeremychase_io.domain_validation_options : dvo.domain_name => {
       name   = dvo.resource_record_name
@@ -35,7 +35,7 @@ resource "aws_route53_record" "jeremychase_io" { # TODO(jchase) rename 'validati
   allow_overwrite = true
   name            = each.value.name
   records         = [each.value.record]
-  ttl             = 60 # TODO increase
+  ttl             = 60 # BUG(low) increase
   type            = each.value.type
   zone_id         = aws_route53_zone.jeremychase_io.zone_id
 }

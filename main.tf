@@ -1,12 +1,15 @@
+# BUG (medium) Update to terraform 0.13
+
 terraform {
+  # BUG(medium) no locking
   backend "s3" {
-    bucket = "terraform.aws.jeremychase.io" # BUG(hardcoded) Need to document
+    bucket = "terraform.aws.jeremychase.io" # BUG(medium) Need to document
     key    = "terraform.state"
     region = "us-east-1"
   }
 
   required_providers {
-    aws    = "~> 2.48"
+    aws    = "~> 2.48" # BUG(medium) update
     google = "~> 3.9"
   }
 }
@@ -17,7 +20,7 @@ provider "aws" {
 }
 
 provider "google" {
-  credentials = file("~/.config/jeremychase-io-4e1d78f64f8d.json") # BUG(hardcoded)
+  credentials = file("~/.config/jeremychase-io-4e1d78f64f8d.json") # BUG(medium)
   project     = "jeremychase-io"
   region      = "us-east1"
 }
