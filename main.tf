@@ -8,7 +8,6 @@ terraform {
   required_providers {
     aws    = "~> 2.48"
     google = "~> 3.9"
-    vultr  = "~> 1.1"
   }
 }
 
@@ -65,126 +64,28 @@ resource "google_compute_instance" "gcp_free" {
     ]
   }
 
-}
-
-# google_dns_managed_zone.jeremychase-io:
-resource "google_dns_managed_zone" "jeremychase-io" {
-  dns_name   = "jeremychase.io."
-  labels     = {}
-  name       = "jeremychase-io"
-  project    = "jeremychase-io"
-  visibility = "public"
-
-  dnssec_config {
-    kind          = "dns#managedZoneDnsSecConfig"
-    non_existence = "nsec3"
-    state         = "on"
-
-    default_key_specs {
-      algorithm  = "rsasha256"
-      key_length = 2048
-      key_type   = "keySigning"
-      kind       = "dns#dnsKeySpec"
-    }
-    default_key_specs {
-      algorithm  = "rsasha256"
-      key_length = 1024
-      key_type   = "zoneSigning"
-      kind       = "dns#dnsKeySpec"
-    }
+  lifecycle {
+    prevent_destroy = true
   }
 
-  timeouts {}
 }
 
-resource "google_dns_record_set" "jeremychase_io_ns" {
-  managed_zone = "jeremychase-io"
-  name         = "jeremychase.io."
-  project      = "jeremychase-io"
-  rrdatas = [
-    "ns-cloud-e1.googledomains.com.",
-    "ns-cloud-e2.googledomains.com.",
-    "ns-cloud-e3.googledomains.com.",
-    "ns-cloud-e4.googledomains.com.",
-  ]
-  ttl  = 21600
-  type = "NS"
-}
-
-resource "google_dns_record_set" "jeremychase_io_soa" {
-  managed_zone = "jeremychase-io"
-  name         = "jeremychase.io."
-  project      = "jeremychase-io"
-  rrdatas = [
-    "ns-cloud-e1.googledomains.com. cloud-dns-hostmaster.google.com. 155 21600 3600 259200 300",
-  ]
-  ttl  = 21600
-  type = "SOA"
-}
-
-resource "google_dns_record_set" "jeremychase_io_txt" {
-  managed_zone = "jeremychase-io"
-  name         = "jeremychase.io."
-  project      = "jeremychase-io"
-  rrdatas = [
-    "\"google-site-verification=vPzG3kKAwhKTwMs6oxxu9VO6NSNduoY5GACvhnpxeXs\"",
-  ]
-  ttl  = 300
-  type = "TXT"
-}
-
-resource "google_dns_record_set" "us-east1_gcp_jeremychase_io_a" {
-  managed_zone = "jeremychase-io"
-  name         = "us-east1.gcp.jeremychase.io."
-  project      = "jeremychase-io"
-  rrdatas = [
+resource "aws_route53_record" "us-east1_gcp_jeremychase_io_a" {
+  zone_id = aws_route53_zone.jeremychase_io.zone_id
+  name    = "us-east1.gcp.jeremychase.io."
+  records = [
     "${google_compute_instance.gcp_free.network_interface[0].access_config[0].nat_ip}",
   ]
   ttl  = 300
   type = "A"
 }
 
-resource "google_dns_record_set" "gcp_jeremychase_io_cname" {
-  managed_zone = "jeremychase-io"
-  name         = "gcp.jeremychase.io."
-  project      = "jeremychase-io"
-  rrdatas = [
-    "${google_dns_record_set.us-east1_gcp_jeremychase_io_a.name}",
+resource "aws_route53_record" "gcp_jeremychase_io_cname" {
+  zone_id = aws_route53_zone.jeremychase_io.zone_id
+  name    = "gcp.jeremychase.io."
+  records = [
+    "${aws_route53_record.us-east1_gcp_jeremychase_io_a.name}",
   ]
   ttl  = 300
   type = "CNAME"
 }
-
-# Configure the Vultr Provider
-# provider "vultr" {
-# }
-
-# resource "vultr_server" "nj-medium" {
-#   plan_id     = 203
-#   os_id       = 365
-#   region_id   = 1
-#   ssh_key_ids = ["5b08514fa6d1a"]
-# }
-
-# resource "google_dns_record_set" "nj_vultr_jeremychase_io_a" {
-#   managed_zone = "jeremychase-io"
-#   name         = "nj.vultr.jeremychase.io."
-#   project      = "jeremychase-io"
-#   rrdatas = [
-#     "${vultr_server.nj-medium.main_ip}",
-#   ]
-#   ttl  = 300
-#   type = "A"
-# }
-
-resource "google_dns_record_set" "www_jeremychase_io_cname" {
-  managed_zone = "jeremychase-io"
-  name         = "www.jeremychase.io."
-  project      = "jeremychase-io"
-  rrdatas = [
-    "ingress.lamp.app.",
-  ]
-  ttl  = 300
-  type = "CNAME"
-}
-
