@@ -45,7 +45,7 @@ resource "aws_cloudfront_origin_access_identity" "oai" {
 
 # BUG(high) redirect from www to apex
 # BUG(high) go through every line
-resource "aws_cloudfront_distribution" "s3_distribution" { # BUG(high) medium
+resource "aws_cloudfront_distribution" "s3" {
   origin {
     domain_name = aws_s3_bucket.www_jeremychase_io.bucket_regional_domain_name
     origin_id   = local.s3_origin_id
@@ -110,12 +110,12 @@ resource "aws_cloudfront_distribution" "s3_distribution" { # BUG(high) medium
     viewer_protocol_policy = "redirect-to-https"
   }
 
-  price_class = "PriceClass_200"
+  price_class = "PriceClass_200" # BUG(medium) evaluate
 
   restrictions {
     geo_restriction {
-      restriction_type = "whitelist"
-      locations        = ["US", "CA", "GB", "DE"]
+      restriction_type = "whitelist"              # BUG(medium) this seems wrong
+      locations        = ["US", "CA", "GB", "DE"] # BUG(medium) this seems wrong
     }
   }
 
