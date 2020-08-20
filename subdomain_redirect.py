@@ -1,23 +1,48 @@
 import json
 
-# BUG(high) fix
+# BUG(low) pull out strings
+
+# This is an origin-request handler redirecting from subdomain to apex for S3 origin
 
 
 def lambda_handler(event, context):
-    response = event["Records"][0]["cf"]["response"]
-    headers = response["headers"]
-
     request = event["Records"][0]["cf"]["request"]
-    request_headers = request["headers"]
+    headers = request["headers"]
+    host_header = "Host"
+    host = headers.get(host_header.lower(), None)
 
-    print(f"request_headers: {request_headers}")
+    if host:
+        if host[0]["value"] == 'www.jeremychase.io':
+            # Redirect from www to apex
+            # BUG(medium) This loses the request path
+            response = {
+                'status': '301',
+                'statusDescription': 'Moved Permanently',
+                'headers': {
+                    'location': [{
+                        'key': 'Location',
+                        'value': 'https://jeremychase.io/'
+                    }]
+                }
+            }
 
-    headerNameSrc = "X-Amz-Meta-Last-Modified"
-    headerNameDst = "Last-Modified"
+            # Return generated response rather than make request to origin
+            return response
 
-    if headers.get(headerNameSrc.lower(), None):
-        headers[headerNameDst.lower()] = [headers[headerNameSrc.lower()][0]]
-        print(
-            f"Response header {headerNameDst.lower()} was set to {headers[headerNameSrc.lower()][0]}")
+        elif host[0]["value"] == 'jeremychase.io':
+            # On apex request; update host header to match signature expected by S3
+            host[0]["value"] = 'www.jeremychase.io.s3.amazonaws.com'
+            headers[host_header] = host
 
-    return response
+        else:
+            # Error condition; do not continue
+            response = {
+                'status': '400',
+                'statusDescription': 'Invalid Host header',
+            }
+
+            # Return generated response
+            return response
+
+    # Make request to origin
+    return request

@@ -82,6 +82,7 @@ resource "aws_cloudfront_distribution" "s3" {
 
     forwarded_values {
       query_string = false
+      headers      = ["Host"] # Segment cache between subdomain and apex. S3 Origin requires Host header to be reconstructed via Lambda@Edge
 
       cookies {
         forward = "none"
@@ -93,9 +94,8 @@ resource "aws_cloudfront_distribution" "s3" {
     default_ttl            = 60 # BUG(low) increase
 
     # Use Lambda@Edge for subdomain redirect
-    # BUG(medium) verify this get cached
     lambda_function_association {
-      event_type = "origin-response" # Modify the response before it’s cached: https://aws.amazon.com/blogs/networking-and-content-delivery/lambdaedge-design-best-practices/
+      event_type = "origin-request" # Generate cacheable response before hitting origin: https://aws.amazon.com/blogs/networking-and-content-delivery/lambdaedge-design-best-practices/
 
       # lambda_arn = "${aws_lambda_function.subdomain_redirect.arn}:1" # BUG(high) https://github.com/terraform-providers/terraform-provider-aws/issues/8081
       lambda_arn = aws_lambda_function.subdomain_redirect.qualified_arn # BUG(low) should be default
