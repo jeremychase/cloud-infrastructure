@@ -143,38 +143,26 @@ resource "aws_iam_role" "iam_for_lambda" {
 EOF
 }
 
-# BUG(high) fix comment and/or policy
-# This is to optionally manage the CloudWatch Log Group for the Lambda Function.
-# If skipping this resource configuration, also add "logs:CreateLogGroup" to the IAM policy below.
-resource "aws_cloudwatch_log_group" "example" {
-  name              = "/aws/lambda/${aws_lambda_function.subdomain_redirect.function_name}"
-  retention_in_days = 14
+# BUG(medium) rename terraform resource
+resource "aws_cloudwatch_log_group" "subdomain_redirect" {
+  name              = "/aws/lambda/${data.aws_region.current.name}.${aws_lambda_function.subdomain_redirect.function_name}"
+  retention_in_days = 365
 }
 
-# BUG(high) why are there two log groups?
+# BUG(medium) rename terraform resource
+data "aws_iam_policy_document" "lambda_logging" {
+  statement {
+    actions   = ["logs:CreateLogStream", "logs:PutLogEvents"]
+    resources = ["${aws_cloudwatch_log_group.subdomain_redirect.arn}:*"]
+  }
+}
 
-# BUG(medium) resolve and remove logs:CreateLogGroup
 resource "aws_iam_policy" "lambda_logging" {
-  name        = "lambda_logging"
+  name        = "lambda_logging" # BUG(medium) rename
   path        = "/"
-  description = "IAM policy for logging from a lambda"
+  description = "Allow Lambda@Edge to log"
 
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-        "logs:CreateLogGroup",
-        "logs:CreateLogStream",
-        "logs:PutLogEvents"
-      ],
-      "Resource": "arn:aws:logs:*:*:*",
-      "Effect": "Allow"
-    }
-  ]
-}
-EOF
+  policy = data.aws_iam_policy_document.lambda_logging.json
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_logs" {
@@ -183,9 +171,10 @@ resource "aws_iam_role_policy_attachment" "lambda_logs" {
 }
 
 # BUG(high) fix zip creation issue
+# BUG(medium) rename terraform resource. include Lambda@Edge trigger
 resource "aws_lambda_function" "subdomain_redirect" {
   filename      = "subdomain_redirect.zip"        # BUG(medium) move
-  function_name = "subdomain_redirect"            # BUG(medium) include domain in function_name
+  function_name = "subdomain_redirect"            # BUG(medium) include domain and Lambda@Edge trigger
   role          = aws_iam_role.iam_for_lambda.arn # BUG(medium) change this
   handler       = "subdomain_redirect.lambda_handler"
 
