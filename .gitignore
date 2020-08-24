@@ -6,3 +6,5 @@ terraform.tfvars
 # non-standard location to put credentials
 .credentials
  
+# BUG(high) this shouldn't be here
+subdomain_redirect.zip

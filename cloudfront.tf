@@ -2,9 +2,7 @@ resource "aws_s3_bucket" "www_jeremychase_io_logs" {
   bucket = "logs-www.jeremychase.io" # BUG(medium) change name
   acl    = "private"
 
-  tags = {
-    Project = "www.jeremychase.io" #BUG(low) fix tags
-  }
+  #BUG(low) fix tags
 
   lifecycle_rule {
     id      = "Intelligent-Tiering"
@@ -43,7 +41,6 @@ resource "aws_cloudfront_origin_access_identity" "oai" {
   comment = "www.jeremychase.io"
 }
 
-# BUG(high) redirect from www to apex, might need lambda_function_association
 resource "aws_cloudfront_distribution" "s3" {
   aliases = ["jeremychase.io", "www.jeremychase.io"]
 
@@ -72,8 +69,6 @@ resource "aws_cloudfront_distribution" "s3" {
     include_cookies = false
     bucket          = aws_s3_bucket.www_jeremychase_io_logs.bucket_domain_name
   }
-
-  # BUG(high) segment cache based on request Host header
 
   default_cache_behavior {
     allowed_methods  = ["GET", "HEAD", "OPTIONS"]

@@ -91,6 +91,7 @@ resource "aws_iam_role" "codebuild" {
 EOF
 }
 
+# BUG(medium) rename terraform resource
 data "aws_iam_policy" "CloudWatchLogsFullAccess" {
   arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
 }

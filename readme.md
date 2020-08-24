@@ -61,4 +61,8 @@ https://medium.com/swlh/create-deploy-a-serverless-react-app-to-s3-cloudfront-on
 https://github.com/aws-samples/aws-codebuild-samples/blob/master/cloudformation/continuous-deployment.yml
 https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html#build-spec.artifacts
 https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-GitHub.html
+https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-examples.html#lambda-examples-http-redirect
 
+## Directory structure
+
+BUG(high) it is a mess. Don't think about it.
