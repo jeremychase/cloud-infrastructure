@@ -232,7 +232,22 @@ resource "aws_codepipeline" "www_jeremychase_io" {
     }
   }
 
-  # BUG(high) invalidate
+  stage {
+    name = "InvalidateCloudFrontCache"
+
+    action {
+      name     = "InvokeInvalidationLambda"
+      category = "Invoke"
+      owner    = "AWS"
+      provider = "Lambda"
+      version  = "1" # https://docs.aws.amazon.com/codepipeline/latest/userguide/reference-pipeline-structure.html says "1" is the only valid type.
+
+      configuration = {
+        FunctionName   = aws_lambda_function.cloudfront_invalidate.function_name
+        UserParameters = aws_cloudfront_distribution.s3.id # UserParameters is a string and could be JSON. Since we are passing a single argument that is unnecessary.
+      }
+    }
+  }
 }
 
 resource "aws_iam_role" "codepipeline_role" {

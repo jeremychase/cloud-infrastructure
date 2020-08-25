@@ -75,6 +75,29 @@ resource "aws_iam_role_policy_attachment" "cloudfront_invalidation_lambda_codepi
   policy_arn = aws_iam_policy.cloudfront_invalidate_codepipeline_result.arn
 }
 
+# BUG(low) rethink terraform resource name.
+data "aws_iam_policy_document" "lambda_cloudfront_invalidate" {
+  statement {
+    actions   = ["cloudfront:CreateInvalidation"]
+    resources = ["*"] # BUG(high) target cf distribution
+  }
+}
+
+# BUG(high) fix logging target
+resource "aws_iam_policy" "lambda_cloudfront_invalidate" {
+  name        = "lambda_cloudfront_invalidate" # BUG(medium) rethink name
+  path        = "/"
+  description = "Allow Lambda to invalidate CloudFront"
+
+  policy = data.aws_iam_policy_document.lambda_cloudfront_invalidate.json
+}
+
+# BUG(low) rethink name
+resource "aws_iam_role_policy_attachment" "lambda_cloudfront_invalidate" {
+  role       = aws_iam_role.cloudfront_invalidation_lambda.name
+  policy_arn = aws_iam_policy.lambda_cloudfront_invalidate.arn
+}
+
 
 # BUG(high) fix zip creation issue
 # BUG(low) rethink terraform resource name.
@@ -89,4 +112,26 @@ resource "aws_lambda_function" "cloudfront_invalidate" {
   source_code_hash = filebase64sha256("cloudfront_invalidate.zip")
 
   runtime = "python3.8"
+}
+
+# BUG(medium) rename terraform resource
+data "aws_iam_policy_document" "codepipeline_invoke_lambda" {
+  statement {
+    actions = ["lambda:InvokeFunction"]
+    # resources = ["${aws_lambda_function.cloudfront_invalidation_lambda.arn}"] // BUG(high) fix
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "codepipeline_invoke_lambda" {
+  name        = "codepipeline_invoke_lambda" # BUG(medium) rename
+  path        = "/"
+  description = "Allow CodePipeline to invoke Invaldiation lambda"
+
+  policy = data.aws_iam_policy_document.codepipeline_invoke_lambda.json
+}
+
+resource "aws_iam_role_policy_attachment" "codepipeline_invoke_lambda" {
+  role       = aws_iam_role.codepipeline_role.name
+  policy_arn = aws_iam_policy.codepipeline_invoke_lambda.arn
 }
