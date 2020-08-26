@@ -170,17 +170,26 @@ resource "aws_iam_role_policy_attachment" "lambda_logs" {
   policy_arn = aws_iam_policy.lambda_logging.arn
 }
 
-# BUG(high) fix zip creation issue
+locals {
+  subdomain_redirect_lambda_file_name = "subdomain_redirect"
+}
+
+data "archive_file" "subdomain_redirect_lambda" {
+  type        = "zip"
+  source_file = "${path.module}/files/${local.subdomain_redirect_lambda_file_name}.py"
+  output_path = "${path.module}/build/${local.subdomain_redirect_lambda_file_name}.zip"
+}
+
 # BUG(medium) rename terraform resource. include Lambda@Edge trigger
 resource "aws_lambda_function" "subdomain_redirect" {
-  filename      = "subdomain_redirect.zip"        # BUG(medium) move
-  function_name = "subdomain_redirect"            # BUG(medium) include domain and Lambda@Edge trigger
-  role          = aws_iam_role.iam_for_lambda.arn # BUG(medium) change this
-  handler       = "subdomain_redirect.lambda_handler"
+  filename      = data.archive_file.subdomain_redirect_lambda.output_path
+  function_name = local.subdomain_redirect_lambda_file_name # BUG(medium) include domain and Lambda@Edge trigger
+  role          = aws_iam_role.iam_for_lambda.arn           # BUG(medium) check this
+  handler       = "${local.subdomain_redirect_lambda_file_name}.lambda_handler"
 
-  publish = true
+  publish = true # Required for use with CloudFront Lambda@Edge
 
-  source_code_hash = filebase64sha256("subdomain_redirect.zip")
+  source_code_hash = filebase64sha256(data.archive_file.subdomain_redirect_lambda.output_path)
 
   runtime = "python3.8"
 }

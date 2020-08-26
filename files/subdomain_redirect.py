@@ -6,6 +6,7 @@ import json
 
 
 def lambda_handler(event, context):
+    # BUG(medium) Document
     request = event["Records"][0]["cf"]["request"]
     headers = request["headers"]
     host_header = "Host"

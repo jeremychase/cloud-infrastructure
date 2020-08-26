@@ -16,6 +16,7 @@ logger.setLevel(logging.INFO)
 
 def lambda_handler(event, context):
     # BUG(medium) Document
+    # BUG(low) Allow execution from triggers other than CodePipeline
     logger.info('Starting CloudFront invalidation Lambda handler')
     ret = 'Failure'
 

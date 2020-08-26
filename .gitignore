@@ -3,8 +3,5 @@
 *.tfstate
 terraform.tfvars
 
-# non-standard location to put credentials
-.credentials
- 
-# BUG(high) this shouldn't be here
-*.zip
+# build output
+build/*

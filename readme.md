@@ -47,7 +47,7 @@ Then:
 
 ```
 $ terraform init
-$ zip subdomain_redirect subdomain_redirect.py && time terraform apply -auto-approve
+$ time terraform apply -auto-approve
 ```
 
 ## References

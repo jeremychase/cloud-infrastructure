@@ -98,18 +98,26 @@ resource "aws_iam_role_policy_attachment" "lambda_cloudfront_invalidate" {
   policy_arn = aws_iam_policy.lambda_cloudfront_invalidate.arn
 }
 
+locals {
+  cloudfront_invalidate_lambda_file_name = "cloudfront_invalidate"
+}
 
-# BUG(high) fix zip creation issue
+data "archive_file" "cloudfront_invalidate_lambda" {
+  type        = "zip"
+  source_file = "${path.module}/files/${local.cloudfront_invalidate_lambda_file_name}.py"
+  output_path = "${path.module}/build/${local.cloudfront_invalidate_lambda_file_name}.zip"
+}
+
 # BUG(low) rethink terraform resource name.
 resource "aws_lambda_function" "cloudfront_invalidate" {
-  filename      = "cloudfront_invalidate.zip"                     # BUG(medium) move
-  function_name = "cloudfront_invalidate"                         # BUG(medium) rename to include project name
+  filename      = data.archive_file.cloudfront_invalidate_lambda.output_path
+  function_name = local.cloudfront_invalidate_lambda_file_name    # BUG(medium) rename to include project name
   role          = aws_iam_role.cloudfront_invalidation_lambda.arn # BUG(medium) check this
-  handler       = "cloudfront_invalidate.lambda_handler"
+  handler       = "${local.cloudfront_invalidate_lambda_file_name}.lambda_handler"
 
-  publish = false #BUG(medium) may need?
+  publish = false # Not required
 
-  source_code_hash = filebase64sha256("cloudfront_invalidate.zip")
+  source_code_hash = filebase64sha256(data.archive_file.cloudfront_invalidate_lambda.output_path)
 
   runtime = "python3.8"
 }
