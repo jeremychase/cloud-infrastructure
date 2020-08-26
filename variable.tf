@@ -1,3 +1,3 @@
-variable "github_token" {
+variable "github_personal_access_token" {
   type = string
 }

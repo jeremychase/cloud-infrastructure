@@ -1,3 +1,4 @@
+#BUG(medium) remove all here documents
 
 resource "aws_s3_bucket" "www_jeremychase_io" {
   bucket = "www.jeremychase.io"
@@ -191,7 +192,7 @@ resource "aws_codepipeline" "www_jeremychase_io" {
         Owner      = "JeremyChase"
         Repo       = "www.jeremychase.io"
         Branch     = "master"
-        OAuthToken = var.github_token # BUG(medium) determine required permissions https://github.com/settings/tokens
+        OAuthToken = var.github_personal_access_token
       }
     }
   }
