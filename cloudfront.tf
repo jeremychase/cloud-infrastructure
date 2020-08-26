@@ -86,7 +86,7 @@ resource "aws_cloudfront_distribution" "s3" {
 
     viewer_protocol_policy = "redirect-to-https"
     compress               = true
-    default_ttl            = 2628000 # One month (730 * 60 * 60)
+    default_ttl            = 86400 # One day (24 * 60 * 60)
 
     # Use Lambda@Edge for subdomain redirect
     lambda_function_association {
