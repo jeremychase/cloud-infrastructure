@@ -35,7 +35,7 @@ resource "aws_route53_record" "jeremychase_io" { # BUG(medium) rename 'validatio
   allow_overwrite = true
   name            = each.value.name
   records         = [each.value.record]
-  ttl             = 60 # BUG(low) increase
+  ttl             = 300 # BUG(low) increase
   type            = each.value.type
   zone_id         = aws_route53_zone.jeremychase_io.zone_id
 }
