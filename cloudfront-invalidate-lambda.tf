@@ -60,7 +60,7 @@ data "aws_iam_policy_document" "cloudfront_invalidate_codepipeline_result" {
   }
 }
 
-# BUG(high) fix logging target
+# BUG(low) rethink terraform resource name.
 resource "aws_iam_policy" "cloudfront_invalidate_codepipeline_result" {
   name        = "cloudfront_invalidate_codepipeline_result" # BUG(medium) rethink name
   path        = "/"
@@ -69,7 +69,7 @@ resource "aws_iam_policy" "cloudfront_invalidate_codepipeline_result" {
   policy = data.aws_iam_policy_document.cloudfront_invalidate_codepipeline_result.json
 }
 
-# BUG(low) rethink name
+# BUG(low) rethink terraform resource name.
 resource "aws_iam_role_policy_attachment" "cloudfront_invalidation_lambda_codepipeline_result" {
   role       = aws_iam_role.cloudfront_invalidation_lambda.name
   policy_arn = aws_iam_policy.cloudfront_invalidate_codepipeline_result.arn
@@ -83,7 +83,7 @@ data "aws_iam_policy_document" "lambda_cloudfront_invalidate" {
   }
 }
 
-# BUG(high) fix logging target
+# BUG(low) rethink terraform resource name.
 resource "aws_iam_policy" "lambda_cloudfront_invalidate" {
   name        = "lambda_cloudfront_invalidate" # BUG(medium) rethink name
   path        = "/"
@@ -92,7 +92,7 @@ resource "aws_iam_policy" "lambda_cloudfront_invalidate" {
   policy = data.aws_iam_policy_document.lambda_cloudfront_invalidate.json
 }
 
-# BUG(low) rethink name
+# BUG(low) rethink terraform resource name.
 resource "aws_iam_role_policy_attachment" "lambda_cloudfront_invalidate" {
   role       = aws_iam_role.cloudfront_invalidation_lambda.name
   policy_arn = aws_iam_policy.lambda_cloudfront_invalidate.arn
