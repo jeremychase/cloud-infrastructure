@@ -92,25 +92,24 @@ resource "aws_iam_role" "codebuild" {
 EOF
 }
 
+# BUG(high) too broad
 # BUG(medium) rename terraform resource
 data "aws_iam_policy" "CloudWatchLogsFullAccess" {
   arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
 }
 
-# BUG(medium) too broad
-# BUG(high) wrong resource name
-resource "aws_iam_role_policy_attachment" "sto-readonly-role-policy-attach" {
+# BUG(low) rethink terraform resource name.
+resource "aws_iam_role_policy_attachment" "codebuild_cloudwatch" {
   role       = aws_iam_role.codebuild.name
   policy_arn = data.aws_iam_policy.CloudWatchLogsFullAccess.arn
 }
 
 # BUG(medium) too broad
-# BUG(medium) poor resource name
+# BUG(low) rethink terraform resource name.
 resource "aws_iam_role_policy_attachment" "s3_bucket_policy_attach" {
   role       = aws_iam_role.codebuild.name
   policy_arn = aws_iam_policy.s3_bucket_policy.arn
 }
-
 
 resource "aws_codebuild_project" "www_jeremychase_io" {
   name           = "www-jeremychase-io"
