@@ -92,5 +92,3 @@ resource "aws_route53_record" "gcp_jeremychase_io_cname" {
   ttl  = 300
   type = "CNAME"
 }
-
-# BUG(medium) cloudwatch logs retention for everything

@@ -1,4 +1,11 @@
-#BUG(medium) remove all here documents
+# BUG(medium) remove all here documents
+
+# BUG(medium) check cloudwatch log retension after destroy
+
+# BUG(medium) maybe move to variable
+locals {
+  project_name = "www-jeremychase-io"
+}
 
 resource "aws_s3_bucket" "www_jeremychase_io" {
   bucket = "www.jeremychase.io"
@@ -74,7 +81,7 @@ POLICY
 }
 
 resource "aws_iam_role" "codebuild" {
-  name = "codebuild"
+  name = "codebuild" # BUG(medium) rethink, maybe rename to "${local.project_name}-codebuild"
 
   assume_role_policy = <<EOF
 {
@@ -92,16 +99,33 @@ resource "aws_iam_role" "codebuild" {
 EOF
 }
 
-# BUG(high) too broad
-# BUG(medium) rename terraform resource
-data "aws_iam_policy" "CloudWatchLogsFullAccess" {
-  arn = "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
+# BUG(low) rethink terraform resource name.
+resource "aws_cloudwatch_log_group" "codebuild" {
+  name              = "/aws/codebuild/${local.project_name}"
+  retention_in_days = 365
+}
+
+# BUG(low) rethink terraform resource name.
+data "aws_iam_policy_document" "codebuild_logging" {
+  statement {
+    actions   = ["logs:CreateLogStream", "logs:PutLogEvents"]
+    resources = ["${aws_cloudwatch_log_group.codebuild.arn}:*"]
+  }
+}
+
+# BUG(low) rethink terraform resource name.
+resource "aws_iam_policy" "codebuild_logging" {
+  name        = "${local.project_name}-codebuild-cloudwatch-logs" # BUG(low) rethink name
+  path        = "/"
+  description = "Allow ${local.project_name} codebuild to log"
+
+  policy = data.aws_iam_policy_document.codebuild_logging.json
 }
 
 # BUG(low) rethink terraform resource name.
 resource "aws_iam_role_policy_attachment" "codebuild_cloudwatch" {
   role       = aws_iam_role.codebuild.name
-  policy_arn = data.aws_iam_policy.CloudWatchLogsFullAccess.arn
+  policy_arn = aws_iam_policy.codebuild_logging.arn
 }
 
 # BUG(medium) too broad
@@ -111,13 +135,21 @@ resource "aws_iam_role_policy_attachment" "s3_bucket_policy_attach" {
   policy_arn = aws_iam_policy.s3_bucket_policy.arn
 }
 
+# BUG(medium) rename terraform resource.
 resource "aws_codebuild_project" "www_jeremychase_io" {
-  name           = "www-jeremychase-io"
-  description    = "Build www.jeremychase.io"
+  name           = local.project_name
+  description    = "Build ${local.project_name}"
   build_timeout  = "5"
   queued_timeout = "5"
 
   service_role = aws_iam_role.codebuild.arn
+
+  logs_config {
+    cloudwatch_logs {
+      group_name  = aws_cloudwatch_log_group.codebuild.name
+      stream_name = "build/${local.project_name}"
+    }
+  }
 
   artifacts {
     type = "CODEPIPELINE"
