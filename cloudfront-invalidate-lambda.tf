@@ -1,6 +1,6 @@
 
 # BUG(low) rethink terraform resource name.
-# BUG(high) pull out this role policy
+# BUG(medium) pull out this role policy
 resource "aws_iam_role" "cloudfront_invalidation_lambda" {
   name = "cloudfront_invalidation_lambda" # BUG(low) This should be renamed
 

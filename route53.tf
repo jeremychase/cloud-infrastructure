@@ -12,7 +12,7 @@ resource "aws_acm_certificate" "jeremychase_io" {
   }
 }
 
-# BUG(medium) This zone should probably be moved to a different workspace. Recreation results in new name servers which need to be updated with the registrar.
+# BUG(high) This zone should probably be moved to a different workspace. Recreation results in new name servers which need to be updated with the registrar.
 # Related to https://github.com/terraform-providers/terraform-provider-aws/issues/88
 resource "aws_route53_zone" "jeremychase_io" {
   name = "jeremychase.io"
