@@ -6,11 +6,11 @@ This repository is used to manage my personal cloud infrastructure.
 
 ### Terraform (required)
 
-* Download binary and put it on your path. [1](https://www.terraform.io/downloads.html)
+* Download binary and put it on your path.[<sup>*</sup>](https://www.terraform.io/downloads.html)
 
 ### Google Provider credentials (required)
 
-* Configured using service account. [2](https://www.terraform.io/docs/providers/google/guides/getting_started.html#adding-credentials)
+* Configured using service account.[<sup>*</sup>](https://www.terraform.io/docs/providers/google/guides/getting_started.html#adding-credentials)
 
 ### Vultr Provider credentials
 
@@ -20,7 +20,7 @@ export VULTR_API_KEY="vultrkey"
 
 ### AWS Provider credentials 
 
-* Pass aws credentials: [3](https://www.terraform.io/docs/providers/aws/index.html#environment-variables)
+* Pass aws credentials:[<sup>*</sup>](https://www.terraform.io/docs/providers/aws/index.html#environment-variables)
 
 ```
 #####################
@@ -66,3 +66,36 @@ https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-exampl
 ## Directory structure
 
 BUG(high) it is a mess. Don't think about it.
+
+## Create notes
+
+1. This creates the Route53 zone, which requires updating the domain's DNS servers at its registrar. The ACM certificate can not be validated until this is done.
+1. Due to an outstanding issue in `terraform-provider-aws`[<sup>*</sup>](https://github.com/terraform-providers/terraform-provider-aws/issues/8081) the Lambda@Edge functions must be created before the CloudFront distribution. This happens with an implicit or explicit dependency.
+
+To work around these issues, create using these steps:
+
+```
+### First - Create Route53 Zone
+terraform apply -target aws_route53_zone.jeremychase_io # BUG(high) rename terraform resource
+
+### Second - Update DNS servers at registrar
+echo "Manually update domain's DNS servers at its registrar to match new zone"
+sleep 10
+
+### Third - Create Lambda@Edge
+terraform apply -target aws_lambda_function.subdomain_redirect
+
+### Finally - Create everything else
+terraform apply
+```
+
+## Destroy notes
+
+1. When you delete a CloudFront distribution the association to its Lambda@Edge Replicated Functions are not immediately deleted. This is [documented](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-edge-delete-replicas.html) by AWS and the only way to resolve this is to wait a few minutes and run `terrafrom destroy` again.
+This is the output when this issue happens:
+
+```Error: Error deleting Lambda Function: InvalidParameterValueException: Lambda was unable to delete arn:aws:lambda:x:x:function:x:x because it is a replicated function. Please see our documentation for Deleting Lambda@Edge Functions and Replicas.```
+
+2. If you toggle `force_destroy_s3_buckets` from `false` to `true`, you must run a `terraform apply` [<sup>*</sup>](https://github.com/terraform-providers/terraform-provider-aws/issues/428#issuecomment-445346454) before terraform is able to delete the buckets. This is the output when this issue happens:
+
+```Error: error deleting S3 Bucket (bucket-name): BucketNotEmpty: The bucket you tried to delete is not empty```

@@ -8,8 +8,9 @@ locals {
 }
 
 resource "aws_s3_bucket" "www_jeremychase_io" {
-  bucket = "www.jeremychase.io"
-  acl    = "private"
+  bucket        = "www.jeremychase.io"
+  acl           = "private"
+  force_destroy = var.force_destroy_s3_buckets
 
   tags = {
     Project = "www.jeremychase.io"
@@ -36,8 +37,9 @@ resource "aws_s3_bucket_public_access_block" "www_jeremychase_io" {
 }
 
 resource "aws_s3_bucket" "www_jeremychase_io_codepipeline_bucket" {
-  bucket = "codepipeline-www.jeremychase.io"
-  acl    = "private"
+  bucket        = "codepipeline-www.jeremychase.io"
+  acl           = "private"
+  force_destroy = var.force_destroy_s3_buckets
 
   lifecycle_rule {
     id      = "Remove CodePipeline artifacts"

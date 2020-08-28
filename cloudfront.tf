@@ -1,6 +1,7 @@
 resource "aws_s3_bucket" "www_jeremychase_io_logs" {
-  bucket = "logs-www.jeremychase.io" # BUG(medium) change name
-  acl    = "private"
+  bucket        = "logs-www.jeremychase.io" # BUG(medium) change name
+  acl           = "private"
+  force_destroy = var.force_destroy_s3_buckets
 
   #BUG(low) fix tags
 
@@ -91,9 +92,7 @@ resource "aws_cloudfront_distribution" "s3" {
     # Use Lambda@Edge for subdomain redirect
     lambda_function_association {
       event_type = "origin-request" # Generate cacheable response before hitting origin: https://aws.amazon.com/blogs/networking-and-content-delivery/lambdaedge-design-best-practices/
-
-      # lambda_arn = "${aws_lambda_function.subdomain_redirect.arn}:1" # BUG(high) https://github.com/terraform-providers/terraform-provider-aws/issues/8081
-      lambda_arn = aws_lambda_function.subdomain_redirect.qualified_arn # BUG(low) should be default
+      lambda_arn = aws_lambda_function.subdomain_redirect.qualified_arn
     }
   }
 
@@ -200,6 +199,5 @@ resource "aws_lambda_permission" "allow_cloudfront" {
   action        = "lambda:GetFunction"
   function_name = aws_lambda_function.subdomain_redirect.function_name
   principal     = "replicator.lambda.amazonaws.com"
-  # source_arn    = "${aws_lambda_function.subdomain_redirect.arn}:1" # BUG(high) DRY
-  source_arn = aws_lambda_function.subdomain_redirect.qualified_arn # BUG(low) should be default
+  source_arn    = aws_lambda_function.subdomain_redirect.qualified_arn
 }
