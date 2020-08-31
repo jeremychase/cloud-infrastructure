@@ -8,10 +8,6 @@ This repository is used to manage my personal cloud infrastructure.
 
 * Download binary and put it on your path.[<sup>*</sup>](https://www.terraform.io/downloads.html)
 
-### Google Provider credentials (required)
-
-* Configured using service account.[<sup>*</sup>](https://www.terraform.io/docs/providers/google/guides/getting_started.html#adding-credentials)
-
 ### AWS Provider credentials (required)
 
 * Pass aws credentials:[<sup>*</sup>](https://www.terraform.io/docs/providers/aws/index.html#environment-variables)
@@ -80,7 +76,7 @@ Error: error deleting S3 Bucket (bucket-name): BucketNotEmpty: The bucket you tr
 ## Directory and file structure
 
 <!-- BUG(high) fix -->
-It is a mess. Don't think about it.
+It is mostly a mess. Starting to transition to [this](https://blog.gruntwork.io/how-to-create-reusable-infrastructure-with-terraform-modules-25526d65f73d) format, but with modules in the same repository.
 
 ## References
 
