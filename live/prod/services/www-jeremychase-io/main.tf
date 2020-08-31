@@ -2,7 +2,7 @@ terraform {
   # BUG(medium) no locking
   backend "s3" {
     bucket = "terraform.aws.jeremychase.io" # BUG(medium) Need to document
-    key    = "terraform.state"
+    key    = "live/prod/services/www-jeremychase-io"
     region = "us-east-1"
   }
 

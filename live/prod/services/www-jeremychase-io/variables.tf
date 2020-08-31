@@ -1,5 +1,3 @@
-# BUG(high) rename file
-
 variable "github_personal_access_token" {
   type = string
 }

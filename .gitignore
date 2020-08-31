@@ -4,4 +4,4 @@
 terraform.tfvars
 
 # build output
-build/*
+build
