@@ -12,12 +12,6 @@ resource "aws_acm_certificate" "jeremychase_io" {
   }
 }
 
-# BUG(high) This zone should probably be moved to a different workspace. Recreation results in new name servers which need to be updated with the registrar.
-# Related to https://github.com/terraform-providers/terraform-provider-aws/issues/88
-resource "aws_route53_zone" "jeremychase_io" {
-  name = "jeremychase.io"
-}
-
 # DNS Validation with Route 53
 #
 # Based on example from:
@@ -39,7 +33,7 @@ resource "aws_route53_record" "jeremychase_io" { # BUG(medium) rename 'validatio
   records         = [each.value.record]
   ttl             = 300 # BUG(low) increase
   type            = each.value.type
-  zone_id         = aws_route53_zone.jeremychase_io.zone_id
+  zone_id         = data.aws_route53_zone.selected.zone_id
 }
 
 resource "aws_acm_certificate_validation" "jeremychase_io" {
@@ -49,8 +43,8 @@ resource "aws_acm_certificate_validation" "jeremychase_io" {
 
 
 resource "aws_route53_record" "www_A" {
-  zone_id = aws_route53_zone.jeremychase_io.zone_id
-  name    = "www.${aws_route53_zone.jeremychase_io.name}"
+  zone_id = data.aws_route53_zone.selected.zone_id
+  name    = "www.${data.aws_route53_zone.selected.name}"
   type    = "A"
 
   alias {
@@ -61,8 +55,8 @@ resource "aws_route53_record" "www_A" {
 }
 
 resource "aws_route53_record" "apex_A" {
-  zone_id = aws_route53_zone.jeremychase_io.zone_id
-  name    = aws_route53_zone.jeremychase_io.name
+  zone_id = data.aws_route53_zone.selected.zone_id
+  name    = data.aws_route53_zone.selected.name
   type    = "A"
 
   alias {
@@ -73,8 +67,8 @@ resource "aws_route53_record" "apex_A" {
 }
 
 resource "aws_route53_record" "www_AAAA" {
-  zone_id = aws_route53_zone.jeremychase_io.zone_id
-  name    = "www.${aws_route53_zone.jeremychase_io.name}"
+  zone_id = data.aws_route53_zone.selected.zone_id
+  name    = "www.${data.aws_route53_zone.selected.name}"
   type    = "AAAA"
 
   alias {
@@ -85,8 +79,8 @@ resource "aws_route53_record" "www_AAAA" {
 }
 
 resource "aws_route53_record" "apex_AAAA" {
-  zone_id = aws_route53_zone.jeremychase_io.zone_id
-  name    = aws_route53_zone.jeremychase_io.name
+  zone_id = data.aws_route53_zone.selected.zone_id
+  name    = data.aws_route53_zone.selected.name
   type    = "AAAA"
 
   alias {

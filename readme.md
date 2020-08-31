@@ -45,7 +45,7 @@ To work around these issues, create using these steps:
 terraform init
 
 ### Second - Create Route53 Zone
-terraform apply -target aws_route53_zone.jeremychase_io # BUG(high) rename terraform resource
+terraform apply -target data.aws_route53_zone.selected # BUG(high) rename terraform resource
 
 ### Third - Update DNS servers at registrar
 echo "Manually update domain's DNS servers at its registrar to match new zone"

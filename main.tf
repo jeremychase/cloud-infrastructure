@@ -17,3 +17,7 @@ provider "aws" {
   profile = "default"
   region  = "us-east-1"
 }
+
+data "aws_route53_zone" "selected" {
+  name = "${var.zone_name}."
+}
