@@ -133,23 +133,24 @@ resource "aws_lambda_function" "cloudfront_invalidate" {
   runtime = "python3.8"
 }
 
-# BUG(medium) rename terraform resource
-data "aws_iam_policy_document" "codepipeline_invoke_lambda" {
+# BUG(low) rethink terraform resource name.
+data "aws_iam_policy_document" "codepipeline_invalidation_lambda_allow" {
   statement {
     actions = ["lambda:InvokeFunction"]
     resources = [aws_lambda_function.cloudfront_invalidate.arn]
   }
 }
 
-resource "aws_iam_policy" "codepipeline_invoke_lambda" {
-  name        = "codepipeline_invoke_lambda" # BUG(medium) rename
-  path        = "/"
-  description = "Allow CodePipeline to invoke Invaldiation lambda"
+resource "aws_iam_policy" "codepipeline_invalidation_lambda_allow" {
+  name        = "${local.project_name}-codepipeline-invalidation-lambda-allow" # BUG(medium) rethink name
 
-  policy = data.aws_iam_policy_document.codepipeline_invoke_lambda.json
+  path        = "/"
+  description = "Allow ${local.project_name} CodePipeline to invoke Invaldiation lambda"
+
+  policy = data.aws_iam_policy_document.codepipeline_invalidation_lambda_allow.json
 }
 
-resource "aws_iam_role_policy_attachment" "codepipeline_invoke_lambda" {
+resource "aws_iam_role_policy_attachment" "codepipeline_invalidation_lambda_allow" {
   role       = aws_iam_role.codepipeline_role.name
-  policy_arn = aws_iam_policy.codepipeline_invoke_lambda.arn
+  policy_arn = aws_iam_policy.codepipeline_invalidation_lambda_allow.arn
 }
