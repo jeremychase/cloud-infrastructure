@@ -75,7 +75,7 @@ data "aws_iam_policy_document" "invalidation_lambda_codepipeline_allow" {
 resource "aws_iam_policy" "invalidation_lambda_codepipeline_allow" {
   name        = "${local.project_name}-invalidation-lambda-codepipeline-allow" # BUG(medium) rethink name
   path        = "/"
-  description = "Allow ${local.project_name} CloudFront-Invalitation Lambda to report result to CodePipeline"
+  description = "Allow ${local.project_name} CloudFront-Invalidation Lambda to report result to CodePipeline"
 
   policy = data.aws_iam_policy_document.invalidation_lambda_codepipeline_allow.json
 }
@@ -87,26 +87,26 @@ resource "aws_iam_role_policy_attachment" "invalidation_lambda_codepipeline_allo
 }
 
 # BUG(low) rethink terraform resource name.
-data "aws_iam_policy_document" "lambda_cloudfront_invalidate" {
+data "aws_iam_policy_document" "invalidation_lambda_cloudfront_allow" {
   statement {
     actions   = ["cloudfront:CreateInvalidation"]
-    resources = ["*"] # BUG(high,wip) target cf distribution
+    resources = ["${aws_cloudfront_distribution.s3.arn}"]
   }
 }
 
 # BUG(low) rethink terraform resource name.
-resource "aws_iam_policy" "lambda_cloudfront_invalidate" {
-  name        = "lambda_cloudfront_invalidate" # BUG(medium) rethink name
+resource "aws_iam_policy" "invalidation_lambda_cloudfront_allow" {
+  name        = "${local.project_name}-invalidation-lambda-cloudfront-allow" # BUG(medium) rethink name
   path        = "/"
-  description = "Allow Lambda to invalidate CloudFront"
+  description = "Allow ${local.project_name} CloudFront-Invalidation Lambda to invalidate CloudFront cache"
 
-  policy = data.aws_iam_policy_document.lambda_cloudfront_invalidate.json
+  policy = data.aws_iam_policy_document.invalidation_lambda_cloudfront_allow.json
 }
 
 # BUG(low) rethink terraform resource name.
-resource "aws_iam_role_policy_attachment" "lambda_cloudfront_invalidate" {
+resource "aws_iam_role_policy_attachment" "invalidation_lambda_cloudfront_allow" {
   role       = aws_iam_role.cloudfront_invalidation_lambda.name
-  policy_arn = aws_iam_policy.lambda_cloudfront_invalidate.arn
+  policy_arn = aws_iam_policy.invalidation_lambda_cloudfront_allow.arn
 }
 
 locals {
