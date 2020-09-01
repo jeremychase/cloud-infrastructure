@@ -117,9 +117,9 @@ data "aws_iam_policy_document" "codebuild_logging" {
 
 # BUG(low) rethink terraform resource name.
 resource "aws_iam_policy" "codebuild_logging" {
-  name        = "${local.project_name}-codebuild-cloudwatch-logs" # BUG(low) rethink name
+  name        = "${local.project_name}-codebuild-cloudwatch-allow" # BUG(low) rethink name
   path        = "/"
-  description = "Allow ${local.project_name} codebuild to log"
+  description = "Allow ${local.project_name} CodeBuild to use CloudWatch"
 
   policy = data.aws_iam_policy_document.codebuild_logging.json
 }
@@ -172,6 +172,7 @@ resource "aws_codebuild_project" "www_jeremychase_io" {
   source {
     type = "CODEPIPELINE"
 
+    # BUG(medium) move to ReactJS repository
     # BUG(medium) possibly replace with https://github.com/terraform-providers/terraform-provider-aws/issues/5101#issuecomment-496663099
     buildspec = <<BUILDSPEC
 version: 0.2

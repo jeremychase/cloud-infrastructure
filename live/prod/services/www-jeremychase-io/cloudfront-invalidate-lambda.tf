@@ -53,33 +53,44 @@ resource "aws_iam_role_policy_attachment" "cloudfront_invalidation_lambda_logs" 
 
 
 # BUG(low) rethink terraform resource name.
-data "aws_iam_policy_document" "cloudfront_invalidate_codepipeline_result" {
+data "aws_iam_policy_document" "invalidation_lambda_codepipeline_allow" {
   statement {
     actions   = ["codepipeline:PutJobSuccessResult", "codepipeline:PutJobFailureResult"]
-    resources = ["*"] # BUG(high) target pipeline
+
+    #
+    # As of September 2020, CodePipeline has partial Resource-level permission support. The
+    # documentation for PutJobSuccessResult and PutJobFailureResult both read:
+    # "Supports only a wildcard (*) in the policy Resource element."
+    #
+    # See:
+    #  https://docs.aws.amazon.com/codepipeline/latest/userguide/permissions-reference.html
+    #  https://docs.aws.amazon.com/IAM/latest/UserGuide/troubleshoot_policies.html#mismatch_action-no-resource
+    #  https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_aws-services-that-work-with-iam.html#deploy_svcs
+    #
+    resources = ["*"]
   }
 }
 
 # BUG(low) rethink terraform resource name.
-resource "aws_iam_policy" "cloudfront_invalidate_codepipeline_result" {
-  name        = "cloudfront_invalidate_codepipeline_result" # BUG(medium) rethink name
+resource "aws_iam_policy" "invalidation_lambda_codepipeline_allow" {
+  name        = "${local.project_name}-invalidation-lambda-codepipeline-allow" # BUG(medium) rethink name
   path        = "/"
-  description = "Allow CloudFront Invalitation Lambda to log"
+  description = "Allow ${local.project_name} CloudFront-Invalitation Lambda to report result to CodePipeline"
 
-  policy = data.aws_iam_policy_document.cloudfront_invalidate_codepipeline_result.json
+  policy = data.aws_iam_policy_document.invalidation_lambda_codepipeline_allow.json
 }
 
 # BUG(low) rethink terraform resource name.
-resource "aws_iam_role_policy_attachment" "cloudfront_invalidation_lambda_codepipeline_result" {
+resource "aws_iam_role_policy_attachment" "invalidation_lambda_codepipeline_allow" {
   role       = aws_iam_role.cloudfront_invalidation_lambda.name
-  policy_arn = aws_iam_policy.cloudfront_invalidate_codepipeline_result.arn
+  policy_arn = aws_iam_policy.invalidation_lambda_codepipeline_allow.arn
 }
 
 # BUG(low) rethink terraform resource name.
 data "aws_iam_policy_document" "lambda_cloudfront_invalidate" {
   statement {
     actions   = ["cloudfront:CreateInvalidation"]
-    resources = ["*"] # BUG(high) target cf distribution
+    resources = ["*"] # BUG(high,wip) target cf distribution
   }
 }
 
