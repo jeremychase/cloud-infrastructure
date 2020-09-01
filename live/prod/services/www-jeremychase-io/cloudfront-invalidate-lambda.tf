@@ -137,8 +137,7 @@ resource "aws_lambda_function" "cloudfront_invalidate" {
 data "aws_iam_policy_document" "codepipeline_invoke_lambda" {
   statement {
     actions = ["lambda:InvokeFunction"]
-    # resources = ["${aws_lambda_function.cloudfront_invalidation_lambda.arn}"] // BUG(high) fix
-    resources = ["*"]
+    resources = [aws_lambda_function.cloudfront_invalidate.arn]
   }
 }
 
