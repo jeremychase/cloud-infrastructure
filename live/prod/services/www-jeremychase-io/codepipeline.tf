@@ -1,5 +1,3 @@
-# BUG(medium) remove all here documents
-
 # BUG(medium) check cloudwatch log retension after destroy
 
 # BUG(medium) maybe move to variable
@@ -85,6 +83,7 @@ POLICY
 resource "aws_iam_role" "codebuild" {
   name = "codebuild" # BUG(medium) rethink, maybe rename to "${local.project_name}-codebuild"
 
+  # BUG(high) HEREDOC
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -131,7 +130,7 @@ resource "aws_iam_role_policy_attachment" "codebuild_cloudwatch" {
 }
 
 # BUG(medium) too broad
-# BUG(low) rethink terraform resource name.
+# BUG(medium) rename terraform resource.
 resource "aws_iam_role_policy_attachment" "s3_bucket_policy_attach" {
   role       = aws_iam_role.codebuild.name
   policy_arn = aws_iam_policy.s3_bucket_policy.arn
@@ -222,6 +221,7 @@ resource "aws_codepipeline" "www_jeremychase_io" {
       version          = "1"
       output_artifacts = ["source_output"]
 
+      # BUG(medium) look for issue where cycling token causes CodePipeline to lose access to GitHub
       configuration = {
         Owner      = "JeremyChase"
         Repo       = "www.jeremychase.io"
@@ -288,6 +288,7 @@ resource "aws_codepipeline" "www_jeremychase_io" {
 resource "aws_iam_role" "codepipeline_role" {
   name = "codepipeline-role"
 
+  # BUG(high) HEREDOC
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -336,6 +337,7 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
   name = "codepipeline_policy"
   role = aws_iam_role.codepipeline_role.id
 
+  # BUG(high) HEREDOC
   policy = <<EOF
 {
   "Version": "2012-10-17",

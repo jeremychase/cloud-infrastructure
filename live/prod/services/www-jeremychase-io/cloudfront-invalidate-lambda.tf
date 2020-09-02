@@ -4,6 +4,7 @@
 resource "aws_iam_role" "cloudfront_invalidation_lambda" {
   name = "cloudfront_invalidation_lambda" # BUG(low) This should be renamed
 
+  # BUG(high) HEREDOC
   assume_role_policy = <<EOF
 {
   "Version": "2012-10-17",
@@ -55,7 +56,7 @@ resource "aws_iam_role_policy_attachment" "cloudfront_invalidation_lambda_logs" 
 # BUG(low) rethink terraform resource name.
 data "aws_iam_policy_document" "invalidation_lambda_codepipeline_allow" {
   statement {
-    actions   = ["codepipeline:PutJobSuccessResult", "codepipeline:PutJobFailureResult"]
+    actions = ["codepipeline:PutJobSuccessResult", "codepipeline:PutJobFailureResult"]
 
     #
     # As of September 2020, CodePipeline has partial Resource-level permission support. The
@@ -136,13 +137,13 @@ resource "aws_lambda_function" "cloudfront_invalidate" {
 # BUG(low) rethink terraform resource name.
 data "aws_iam_policy_document" "codepipeline_invalidation_lambda_allow" {
   statement {
-    actions = ["lambda:InvokeFunction"]
+    actions   = ["lambda:InvokeFunction"]
     resources = [aws_lambda_function.cloudfront_invalidate.arn]
   }
 }
 
 resource "aws_iam_policy" "codepipeline_invalidation_lambda_allow" {
-  name        = "${local.project_name}-codepipeline-invalidation-lambda-allow" # BUG(medium) rethink name
+  name = "${local.project_name}-codepipeline-invalidation-lambda-allow" # BUG(medium) rethink name
 
   path        = "/"
   description = "Allow ${local.project_name} CodePipeline to invoke Invaldiation Lambda"
