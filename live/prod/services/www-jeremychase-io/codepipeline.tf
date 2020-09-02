@@ -133,7 +133,7 @@ resource "aws_iam_role_policy_attachment" "codebuild_cloudwatch" {
 # BUG(medium) rename terraform resource.
 resource "aws_iam_role_policy_attachment" "s3_bucket_policy_attach" {
   role       = aws_iam_role.codebuild.name
-  policy_arn = aws_iam_policy.s3_bucket_policy.arn
+  policy_arn = aws_iam_policy.codepipeline_bucket_allow.arn
 }
 
 # BUG(medium) rename terraform resource.
@@ -306,35 +306,42 @@ EOF
 
 }
 
-# BUG(high) this is duplicated
-# BUG(medium) poor resource name
-resource "aws_iam_policy" "s3_bucket_policy" {
-  name = "s3_bucket_policy"
-
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect":"Allow",
-      "Action": [
-        "s3:GetObject",
-        "s3:GetObjectVersion",
-        "s3:GetBucketVersioning",
-        "s3:PutObject"
-      ],
-      "Resource": [
-        "${aws_s3_bucket.www_jeremychase_io_codepipeline_bucket.arn}",
-        "${aws_s3_bucket.www_jeremychase_io_codepipeline_bucket.arn}/*"
-      ]
-    }
-  ]
-}
-EOF
+# BUG(low) rethink terraform resource name.
+data "aws_iam_policy_document" "codepipeline_bucket_allow" {
+  statement {
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+      "s3:GetBucketVersioning",
+      "s3:PutObject"
+    ]
+    resources = [
+      "${aws_s3_bucket.www_jeremychase_io_codepipeline_bucket.arn}",
+      "${aws_s3_bucket.www_jeremychase_io_codepipeline_bucket.arn}/*" // BUG(medium) Necessary?
+    ]
+  }
 }
 
-resource "aws_iam_role_policy" "codepipeline_policy" {
-  name = "codepipeline_policy"
+# BUG(low) rethink terraform resource name.
+# used by aws_iam_role.codebuild, which is the service_role for aws_codebuild_project
+resource "aws_iam_policy" "codepipeline_bucket_allow" {
+  name        = "${local.project_name}-codepipeline-bucket-allow"
+  description = "Allow ${local.project_name} access to bucket used by CodePipeline"
+
+  policy = data.aws_iam_policy_document.codepipeline_bucket_allow.json
+}
+
+# BUG(low) rethink terraform resource name.
+resource "aws_iam_role_policy_attachment" "codepipeline_codepipeline_bucket_allow" {
+  role       = aws_iam_role.codepipeline_role.name
+  policy_arn = aws_iam_policy.codepipeline_bucket_allow.arn
+}
+
+# BUG(low) rethink terraform resource name.
+# BUG(high) look at Resource
+resource "aws_iam_role_policy" "codepipeline_s3_origin_allow" {
+  name = "s3_origin_allow"
+
   role = aws_iam_role.codepipeline_role.id
 
   # BUG(high) HEREDOC
@@ -352,12 +359,28 @@ resource "aws_iam_role_policy" "codepipeline_policy" {
         "s3:PutObject"
       ],
       "Resource": [
-        "${aws_s3_bucket.www_jeremychase_io_codepipeline_bucket.arn}",
-        "${aws_s3_bucket.www_jeremychase_io_codepipeline_bucket.arn}/*",
         "${aws_s3_bucket.www_jeremychase_io.arn}",
         "${aws_s3_bucket.www_jeremychase_io.arn}/*"
       ]
-    },
+    }
+  ]
+}
+EOF
+}
+
+# BUG(low) rethink terraform resource name.
+# BUG(high) look at Resource
+resource "aws_iam_role_policy" "codepipeline_codebuild_allow" {
+  name = "codebuild_allow"
+
+  role = aws_iam_role.codepipeline_role.id
+
+  # BUG(high) HEREDOC
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+
     {
       "Effect": "Allow",
       "Action": [
