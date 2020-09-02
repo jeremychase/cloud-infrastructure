@@ -145,7 +145,7 @@ resource "aws_iam_policy" "codepipeline_invalidation_lambda_allow" {
   name        = "${local.project_name}-codepipeline-invalidation-lambda-allow" # BUG(medium) rethink name
 
   path        = "/"
-  description = "Allow ${local.project_name} CodePipeline to invoke Invaldiation lambda"
+  description = "Allow ${local.project_name} CodePipeline to invoke Invaldiation Lambda"
 
   policy = data.aws_iam_policy_document.codepipeline_invalidation_lambda_allow.json
 }

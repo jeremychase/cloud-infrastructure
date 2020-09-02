@@ -29,7 +29,7 @@ terraform apply
 
 ### Destroy
 
-1. When you delete a CloudFront distribution the association to its Lambda@Edge Replicated Functions are not immediately deleted. This is [documented](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-edge-delete-replicas.html) by AWS and the only way to resolve this is to wait a few minutes and run `terrafrom destroy` again.
+1. When you delete a CloudFront distribution the association to its Lambda@Edge Replicated Functions are not immediately deleted. This is [documented](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-edge-delete-replicas.html) by AWS and the only way to resolve this is to wait a few minutes and run `terraform destroy` again.
 This is the output when this issue happens:
 
 ```
