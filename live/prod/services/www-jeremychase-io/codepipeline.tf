@@ -62,6 +62,7 @@ resource "aws_s3_bucket_public_access_block" "www_jeremychase_io_codepipeline_bu
 resource "aws_s3_bucket_policy" "oai" {
   bucket = aws_s3_bucket.www_jeremychase_io.id
 
+  # BUG(high) HEREDOC
   policy = <<POLICY
 {
   "Version": "2012-10-17",
@@ -129,7 +130,36 @@ resource "aws_iam_role_policy_attachment" "codebuild_cloudwatch" {
   policy_arn = aws_iam_policy.codebuild_logging.arn
 }
 
-# BUG(medium) too broad
+# BUG(low) rethink terraform resource name.
+# BUG(medium) Some of these actions may not be necessary.
+data "aws_iam_policy_document" "kms_allow" {
+  statement {
+    actions = [
+      "kms:DescribeKey",
+      "kms:GenerateDataKey*",
+      "kms:Encrypt",
+      "kms:ReEncrypt*",
+      "kms:Decrypt"
+    ]
+    resources = [aws_kms_key.codepipeline_artifact_store.arn]
+  }
+}
+
+# BUG(low) rethink terraform resource name.
+resource "aws_iam_policy" "kms_allow" {
+  name        = "${local.project_name}-kms-allow" # BUG(low) rethink name
+  path        = "/"
+  description = "Allow ${local.project_name} access to KMS for CodePipeline artifact storage in S3"
+
+  policy = data.aws_iam_policy_document.kms_allow.json
+}
+
+# BUG(low) rethink terraform resource name.
+resource "aws_iam_role_policy_attachment" "codebuild_kms_allow" {
+  role       = aws_iam_role.codebuild.name
+  policy_arn = aws_iam_policy.kms_allow.arn
+}
+
 # BUG(medium) rename terraform resource.
 resource "aws_iam_role_policy_attachment" "s3_bucket_policy_attach" {
   role       = aws_iam_role.codebuild.name
@@ -203,11 +233,10 @@ resource "aws_codepipeline" "www_jeremychase_io" {
     location = aws_s3_bucket.www_jeremychase_io_codepipeline_bucket.bucket
     type     = "S3"
 
-    # BUG(high) fix
-    # encryption_key {
-    #   id   = data.aws_kms_alias.s3kmskey.arn
-    #   type = "KMS"
-    # }
+    encryption_key {
+      id   = aws_kms_key.codepipeline_artifact_store.arn
+      type = "KMS"
+    }
   }
 
   stage {
@@ -338,6 +367,12 @@ resource "aws_iam_role_policy_attachment" "codepipeline_codepipeline_bucket_allo
 }
 
 # BUG(low) rethink terraform resource name.
+resource "aws_iam_role_policy_attachment" "codepipeline_kms_allow" {
+  role       = aws_iam_role.codepipeline_role.name
+  policy_arn = aws_iam_policy.kms_allow.arn
+}
+
+# BUG(low) rethink terraform resource name.
 # BUG(high) look at Resource
 resource "aws_iam_role_policy" "codepipeline_s3_origin_allow" {
   name = "s3_origin_allow"
@@ -394,7 +429,12 @@ resource "aws_iam_role_policy" "codepipeline_codebuild_allow" {
 EOF
 }
 
-# BUG(high) fix
-# data "aws_kms_alias" "s3kmskey" {
-#   name = "alias/myKmsKey"
-# }
+resource "aws_kms_key" "codepipeline_artifact_store" {
+  description = "Used for ${local.project_name} CodePipeline artifact storage in S3"
+}
+
+# The alias is not required but does neaten up the console output.
+resource "aws_kms_alias" "codepipeline_artifact_store" {
+  name          = "alias/codepipeline_artifact_store"
+  target_key_id = aws_kms_key.codepipeline_artifact_store.key_id
+}

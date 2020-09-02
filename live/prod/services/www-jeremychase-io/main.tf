@@ -1,3 +1,5 @@
+# BUG(high) enable CloudTrail
+
 terraform {
   # BUG(medium) no locking
   backend "s3" {

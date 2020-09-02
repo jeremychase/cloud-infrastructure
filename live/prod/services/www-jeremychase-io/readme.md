@@ -58,3 +58,4 @@ https://github.com/aws-samples/aws-codebuild-samples/blob/master/cloudformation/
 https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html#build-spec.artifacts
 https://docs.aws.amazon.com/codepipeline/latest/userguide/action-reference-GitHub.html
 https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/lambda-examples.html#lambda-examples-http-redirect
+https://aws.amazon.com/premiumsupport/knowledge-center/codepipeline-artifacts-s3/
