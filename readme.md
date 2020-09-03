@@ -7,6 +7,8 @@ live/
 ├── mgmt
 │   ├── dns-zones
 │   │   └── jeremychase-io
+│   ├── governance
+│   │   └── aws-cloudtrail
 │   └── services
 │       └── gcp-free-tier-bastion
 └── prod

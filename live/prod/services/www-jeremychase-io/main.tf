@@ -1,5 +1,3 @@
-# BUG(high) enable CloudTrail
-
 terraform {
   # BUG(medium) no locking
   backend "s3" {
@@ -11,7 +9,7 @@ terraform {
   required_version = "~> 0.12.24" # BUG(medium) Update to terraform 0.13
 
   required_providers {
-    aws = "~> 3.2.0"
+    aws     = "~> 3.2.0"
     archive = "~> 1.3"
   }
 }
