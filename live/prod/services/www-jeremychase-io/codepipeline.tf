@@ -372,8 +372,9 @@ resource "aws_iam_role_policy_attachment" "codepipeline_kms_allow" {
   policy_arn = aws_iam_policy.kms_allow.arn
 }
 
-# BUG(low) rethink terraform resource name.
 # BUG(high) look at Resource
+# BUG(medium) resolve inline policy
+# BUG(low) rethink terraform resource name.
 resource "aws_iam_role_policy" "codepipeline_s3_origin_allow" {
   name = "s3_origin_allow"
 
@@ -404,29 +405,21 @@ EOF
 }
 
 # BUG(low) rethink terraform resource name.
-# BUG(high) look at Resource
+data "aws_iam_policy_document" "codepipeline_codebuild_allow" {
+  statement {
+    actions   = ["codebuild:BatchGetBuilds", "codebuild:StartBuild"]
+    resources = [aws_codebuild_project.www_jeremychase_io.arn]
+  }
+}
+
+# BUG(medium) resolve inline policy
+# BUG(low) rethink terraform resource name.
 resource "aws_iam_role_policy" "codepipeline_codebuild_allow" {
   name = "codebuild_allow"
 
   role = aws_iam_role.codepipeline_role.id
 
-  # BUG(high) HEREDOC
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-
-    {
-      "Effect": "Allow",
-      "Action": [
-        "codebuild:BatchGetBuilds",
-        "codebuild:StartBuild"
-      ],
-      "Resource": "*"
-    }
-  ]
-}
-EOF
+  policy = data.aws_iam_policy_document.codepipeline_codebuild_allow.json
 }
 
 resource "aws_kms_key" "codepipeline_artifact_store" {
