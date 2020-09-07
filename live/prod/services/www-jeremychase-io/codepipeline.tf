@@ -422,6 +422,7 @@ resource "aws_iam_role_policy" "codepipeline_codebuild_allow" {
   policy = data.aws_iam_policy_document.codepipeline_codebuild_allow.json
 }
 
+# BUG(medium) evaluate pricing
 resource "aws_kms_key" "codepipeline_artifact_store" {
   description = "Used for ${local.project_name} CodePipeline artifact storage in S3"
 }
