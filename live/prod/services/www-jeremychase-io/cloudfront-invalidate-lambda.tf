@@ -1,7 +1,7 @@
 
 # BUG(low) rethink terraform resource name.
 resource "aws_iam_role" "cloudfront_invalidation_lambda" {
-  name = "cloudfront_invalidation_lambda" # BUG(low) This should be renamed
+  name = "${local.project_name}-cloudfront-invalidation-lambda" # BUG(low) rethink name
 
   assume_role_policy = data.aws_iam_policy_document.cloudfront_invalidation_lambda.json
 }
