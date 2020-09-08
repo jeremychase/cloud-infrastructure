@@ -122,25 +122,23 @@ resource "aws_iam_role" "iam_for_lambda" {
   name = "iam_for_lambda" # BUG(low) This should be renamed
 
 
-  # BUG(high) HEREDOC
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-         "Principal": {
-            "Service": [
-               "lambda.amazonaws.com",
-               "edgelambda.amazonaws.com"
-            ]
-         },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
+  assume_role_policy = data.aws_iam_policy_document.iam_for_lambda.json
 }
-EOF
+
+# BUG(low) rethink terraform resource name.
+data "aws_iam_policy_document" "iam_for_lambda" {
+  statement {
+    sid = ""
+
+    actions = [
+      "sts:AssumeRole",
+    ]
+
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com", "edgelambda.amazonaws.com"]
+    }
+  }
 }
 
 # BUG(medium) rename terraform resource
