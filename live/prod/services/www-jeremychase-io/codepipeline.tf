@@ -62,23 +62,22 @@ resource "aws_s3_bucket_public_access_block" "www_jeremychase_io_codepipeline_bu
 resource "aws_s3_bucket_policy" "oai" {
   bucket = aws_s3_bucket.www_jeremychase_io.id
 
-  # BUG(high) HEREDOC
-  policy = <<POLICY
-{
-  "Version": "2012-10-17",
-  "Id": "PolicyForCloudFrontPrivateContent",
-  "Statement": [
-      {
-          "Effect": "Allow",
-          "Principal": {
-              "AWS": "${aws_cloudfront_origin_access_identity.oai.iam_arn}"
-          },
-          "Action": "s3:GetObject",
-          "Resource": "arn:aws:s3:::${aws_s3_bucket.www_jeremychase_io.id}/*"
-      }
-  ]
+  policy = data.aws_iam_policy_document.aws_s3_bucket_policy_oai.json
 }
-POLICY
+
+# BUG(low) rethink terraform resource name.
+data "aws_iam_policy_document" "aws_s3_bucket_policy_oai" {
+  policy_id = "PolicyForCloudFrontPrivateContent"
+
+  statement {
+    actions   = ["s3:GetObject", ]
+    resources = ["arn:aws:s3:::${aws_s3_bucket.www_jeremychase_io.id}/*"]
+
+    principals {
+      type        = "AWS"
+      identifiers = [aws_cloudfront_origin_access_identity.oai.iam_arn]
+    }
+  }
 }
 
 resource "aws_iam_role" "codebuild" {
