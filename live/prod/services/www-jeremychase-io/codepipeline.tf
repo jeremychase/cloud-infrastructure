@@ -316,22 +316,21 @@ resource "aws_codepipeline" "www_jeremychase_io" {
 resource "aws_iam_role" "codepipeline_role" {
   name = "codepipeline-role"
 
-  # BUG(high) HEREDOC
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "codepipeline.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
+  assume_role_policy = data.aws_iam_policy_document.codepipeline_trust_relationship.json
 }
-EOF
 
+# BUG(low) rethink terraform resource name.
+data "aws_iam_policy_document" "codepipeline_trust_relationship" {
+  statement {
+    actions = [
+      "sts:AssumeRole",
+    ]
+
+    principals {
+      type        = "Service"
+      identifiers = ["codepipeline.amazonaws.com"]
+    }
+  }
 }
 
 # BUG(low) rethink terraform resource name.
