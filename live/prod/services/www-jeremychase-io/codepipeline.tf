@@ -81,23 +81,23 @@ data "aws_iam_policy_document" "aws_s3_bucket_policy_oai" {
 }
 
 resource "aws_iam_role" "codebuild" {
-  name = "codebuild" # BUG(medium) rethink, maybe rename to "${local.project_name}-codebuild"
+  name = "${local.project_name}-codebuild" # BUG(low) rethink name
 
-  # BUG(high) HEREDOC
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Principal": {
-        "Service": "codebuild.amazonaws.com"
-      },
-      "Action": "sts:AssumeRole"
-    }
-  ]
+  assume_role_policy = data.aws_iam_policy_document.codebuild_trust_relationship.json
 }
-EOF
+
+# BUG(low) rethink terraform resource name.
+data "aws_iam_policy_document" "codebuild_trust_relationship" {
+  statement {
+    actions = [
+      "sts:AssumeRole",
+    ]
+
+    principals {
+      type        = "Service"
+      identifiers = ["codebuild.amazonaws.com"]
+    }
+  }
 }
 
 # BUG(low) rethink terraform resource name.
