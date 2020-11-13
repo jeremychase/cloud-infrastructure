@@ -370,36 +370,31 @@ resource "aws_iam_role_policy_attachment" "codepipeline_kms_allow" {
   policy_arn = aws_iam_policy.kms_allow.arn
 }
 
+# BUG(low) rethink terraform resource name.
+data "aws_iam_policy_document" "codepipeline_s3_origin_allow" {
+  statement {
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+      "s3:GetBucketVersioning",
+      "s3:PutObjectVersionAcl",
+      "s3:PutObject"
+    ]
+    resources = [
+      aws_s3_bucket.www_jeremychase_io.arn,
+      "${aws_s3_bucket.www_jeremychase_io.arn}/*"
+    ]
+  }
+}
+
 # BUG(high) look at Resource
-# BUG(medium) resolve inline policy
 # BUG(low) rethink terraform resource name.
 resource "aws_iam_role_policy" "codepipeline_s3_origin_allow" {
   name = "s3_origin_allow"
 
   role = aws_iam_role.codepipeline_role.id
 
-  # BUG(high) HEREDOC
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect":"Allow",
-      "Action": [
-        "s3:GetObject",
-        "s3:GetObjectVersion",
-        "s3:GetBucketVersioning",
-        "s3:PutObjectVersionAcl",
-        "s3:PutObject"
-      ],
-      "Resource": [
-        "${aws_s3_bucket.www_jeremychase_io.arn}",
-        "${aws_s3_bucket.www_jeremychase_io.arn}/*"
-      ]
-    }
-  ]
-}
-EOF
+  policy = data.aws_iam_policy_document.codepipeline_s3_origin_allow.json
 }
 
 # BUG(low) rethink terraform resource name.
