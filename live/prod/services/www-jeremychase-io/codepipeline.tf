@@ -387,7 +387,7 @@ data "aws_iam_policy_document" "codepipeline_s3_origin_allow" {
   }
 }
 
-# BUG(high) look at Resource
+# BUG(high) switch to aws_iam_policy and aws_iam_role_policy_attachment
 # BUG(low) rethink terraform resource name.
 resource "aws_iam_role_policy" "codepipeline_s3_origin_allow" {
   name = "s3_origin_allow"
@@ -405,7 +405,7 @@ data "aws_iam_policy_document" "codepipeline_codebuild_allow" {
   }
 }
 
-# BUG(medium) resolve inline policy
+# BUG(high) switch to aws_iam_policy and aws_iam_role_policy_attachment
 # BUG(low) rethink terraform resource name.
 resource "aws_iam_role_policy" "codepipeline_codebuild_allow" {
   name = "codebuild_allow"
