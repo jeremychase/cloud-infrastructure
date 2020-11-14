@@ -314,7 +314,7 @@ resource "aws_codepipeline" "www_jeremychase_io" {
 }
 
 resource "aws_iam_role" "codepipeline_role" {
-  name = "codepipeline-role"
+  name = "codepipeline-role" # BUG(high) rename
 
   assume_role_policy = data.aws_iam_policy_document.codepipeline_trust_relationship.json
 }

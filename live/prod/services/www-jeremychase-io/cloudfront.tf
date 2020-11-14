@@ -119,9 +119,7 @@ resource "aws_cloudfront_distribution" "s3" {
 # BUG(medium) This might not need edgelambda.amazonaws.com
 # BUG(low) This should be renamed
 resource "aws_iam_role" "iam_for_lambda" {
-  name = "iam_for_lambda" # BUG(low) This should be renamed
-
-
+  name = "iam_for_lambda" # BUG(high) rename
   assume_role_policy = data.aws_iam_policy_document.iam_for_lambda.json
 }
 
