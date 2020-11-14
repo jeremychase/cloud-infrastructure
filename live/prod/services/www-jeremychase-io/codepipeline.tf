@@ -405,14 +405,16 @@ data "aws_iam_policy_document" "codepipeline_codebuild_allow" {
   }
 }
 
-# BUG(high) switch to aws_iam_policy and aws_iam_role_policy_attachment
 # BUG(low) rethink terraform resource name.
-resource "aws_iam_role_policy" "codepipeline_codebuild_allow" {
-  name = "codebuild_allow"
-
-  role = aws_iam_role.codepipeline_role.id
-
+resource "aws_iam_policy" "codepipeline_codebuild_allow" {
+  name   = "${local.project_name}-codebuild-allow" # BUG(low) rethink name
   policy = data.aws_iam_policy_document.codepipeline_codebuild_allow.json
+}
+
+# BUG(low) rethink terraform resource name.
+resource "aws_iam_role_policy_attachment" "codepipeline_codebuild_allow" {
+  role       = aws_iam_role.codepipeline_role.name
+  policy_arn = aws_iam_policy.codepipeline_codebuild_allow.arn
 }
 
 # BUG(medium) evaluate pricing
