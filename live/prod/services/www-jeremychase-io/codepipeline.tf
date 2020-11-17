@@ -129,36 +129,6 @@ resource "aws_iam_role_policy_attachment" "codebuild_cloudwatch" {
   policy_arn = aws_iam_policy.codebuild_logging.arn
 }
 
-# BUG(low) rethink terraform resource name.
-# BUG(medium) Some of these actions may not be necessary.
-data "aws_iam_policy_document" "kms_allow" {
-  statement {
-    actions = [
-      "kms:DescribeKey",
-      "kms:GenerateDataKey*",
-      "kms:Encrypt",
-      "kms:ReEncrypt*",
-      "kms:Decrypt"
-    ]
-    resources = [aws_kms_key.codepipeline_artifact_store.arn]
-  }
-}
-
-# BUG(low) rethink terraform resource name.
-resource "aws_iam_policy" "kms_allow" {
-  name        = "${local.project_name}-kms-allow" # BUG(low) rethink name
-  path        = "/"
-  description = "Allow ${local.project_name} access to KMS for CodePipeline artifact storage in S3"
-
-  policy = data.aws_iam_policy_document.kms_allow.json
-}
-
-# BUG(low) rethink terraform resource name.
-resource "aws_iam_role_policy_attachment" "codebuild_kms_allow" {
-  role       = aws_iam_role.codebuild.name
-  policy_arn = aws_iam_policy.kms_allow.arn
-}
-
 # BUG(medium) rename terraform resource.
 resource "aws_iam_role_policy_attachment" "s3_bucket_policy_attach" {
   role       = aws_iam_role.codebuild.name
@@ -231,11 +201,6 @@ resource "aws_codepipeline" "www_jeremychase_io" {
   artifact_store {
     location = aws_s3_bucket.www_jeremychase_io_codepipeline_bucket.bucket
     type     = "S3"
-
-    encryption_key {
-      id   = aws_kms_key.codepipeline_artifact_store.arn
-      type = "KMS"
-    }
   }
 
   stage {
@@ -365,12 +330,6 @@ resource "aws_iam_role_policy_attachment" "codepipeline_codepipeline_bucket_allo
 }
 
 # BUG(low) rethink terraform resource name.
-resource "aws_iam_role_policy_attachment" "codepipeline_kms_allow" {
-  role       = aws_iam_role.codepipeline_role.name
-  policy_arn = aws_iam_policy.kms_allow.arn
-}
-
-# BUG(low) rethink terraform resource name.
 data "aws_iam_policy_document" "codepipeline_s3_origin_allow" {
   statement {
     actions = [
@@ -415,15 +374,4 @@ resource "aws_iam_policy" "codepipeline_codebuild_allow" {
 resource "aws_iam_role_policy_attachment" "codepipeline_codebuild_allow" {
   role       = aws_iam_role.codepipeline_role.name
   policy_arn = aws_iam_policy.codepipeline_codebuild_allow.arn
-}
-
-# BUG(medium) evaluate pricing
-resource "aws_kms_key" "codepipeline_artifact_store" {
-  description = "Used for ${local.project_name} CodePipeline artifact storage in S3"
-}
-
-# The alias is not required but does neaten up the console output.
-resource "aws_kms_alias" "codepipeline_artifact_store" {
-  name          = "alias/codepipeline_artifact_store"
-  target_key_id = aws_kms_key.codepipeline_artifact_store.key_id
 }
