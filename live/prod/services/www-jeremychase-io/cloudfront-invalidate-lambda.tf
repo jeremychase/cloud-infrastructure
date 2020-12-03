@@ -89,7 +89,7 @@ resource "aws_iam_role_policy_attachment" "invalidation_lambda_codepipeline_allo
 data "aws_iam_policy_document" "invalidation_lambda_cloudfront_allow" {
   statement {
     actions   = ["cloudfront:CreateInvalidation"]
-    resources = ["${aws_cloudfront_distribution.s3.arn}"]
+    resources = [aws_cloudfront_distribution.s3.arn]
   }
 }
 

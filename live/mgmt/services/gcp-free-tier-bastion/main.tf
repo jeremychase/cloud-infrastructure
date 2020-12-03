@@ -6,11 +6,15 @@ terraform {
     region = "us-east-1"
   }
 
-  required_version = "~> 0.12.24" # BUG(low) Update to terraform 0.13
-
   required_providers {
-    aws    = "3.14.0"
-    google = "~> 3.9"
+    aws = {
+      source  = "hashicorp/aws"
+      version = "3.14.0"
+    }
+    google = {
+      source  = "hashicorp/google"
+      version = "~> 3.9"
+    }
   }
 }
 
@@ -71,7 +75,7 @@ resource "aws_route53_record" "a_record" {
   zone_id = data.aws_route53_zone.selected.zone_id
   name    = "us-east1.gcp.${var.zone_name}."
   records = [
-    "${google_compute_instance.free.network_interface[0].access_config[0].nat_ip}",
+    google_compute_instance.free.network_interface[0].access_config[0].nat_ip,
   ]
   ttl  = 300
   type = "A"
@@ -81,7 +85,7 @@ resource "aws_route53_record" "cname" {
   zone_id = data.aws_route53_zone.selected.zone_id
   name    = "gcp.${var.zone_name}."
   records = [
-    "${aws_route53_record.a_record.name}",
+    aws_route53_record.a_record.name,
   ]
   ttl  = 300
   type = "CNAME"

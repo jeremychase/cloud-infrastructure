@@ -308,7 +308,7 @@ data "aws_iam_policy_document" "codepipeline_bucket_allow" {
       "s3:PutObject"
     ]
     resources = [
-      "${aws_s3_bucket.www_jeremychase_io_codepipeline_bucket.arn}",
+      aws_s3_bucket.www_jeremychase_io_codepipeline_bucket.arn,
       "${aws_s3_bucket.www_jeremychase_io_codepipeline_bucket.arn}/*" // BUG(medium) Necessary?
     ]
   }

@@ -6,11 +6,15 @@ terraform {
     region = "us-east-1"
   }
 
-  required_version = "~> 0.12.24" # BUG(medium) Update to terraform 0.13
-
   required_providers {
-    archive = "~> 1.3"
-    aws     = "3.14.0"
+    archive = {
+      source  = "hashicorp/archive"
+      version = "~> 1.3"
+    }
+    aws = {
+      source  = "hashicorp/aws"
+      version = "3.14.0"
+    }
   }
 }
 
