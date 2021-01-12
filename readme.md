@@ -10,6 +10,7 @@ live/
 │   ├── governance
 │   │   └── aws-cloudtrail
 │   └── services
+│       ├── aws-bastion
 │       └── gcp-free-tier-bastion
 └── prod
     └── services
