@@ -93,15 +93,20 @@ resource "aws_instance" "graviton" {
   }
 }
 
+resource "aws_eip" "graviton" {
+  instance = aws_instance.graviton.id
+  vpc      = true
+}
+
 data "aws_route53_zone" "selected" {
   name = "${var.zone_name}."
 }
 
-resource "aws_route53_record" "instance_cname" {
+resource "aws_route53_record" "eip_cname" {
   zone_id = data.aws_route53_zone.selected.zone_id
   name    = "us-east-1.aws.${var.zone_name}."
   records = [
-    aws_instance.graviton.public_dns,
+    aws_eip.graviton.public_dns,
   ]
   ttl  = 300
   type = "CNAME"
@@ -111,7 +116,7 @@ resource "aws_route53_record" "short_cname" {
   zone_id = data.aws_route53_zone.selected.zone_id
   name    = "aws.${var.zone_name}."
   records = [
-    aws_route53_record.instance_cname.name,
+    aws_route53_record.eip_cname.name,
   ]
   ttl  = 300
   type = "CNAME"
