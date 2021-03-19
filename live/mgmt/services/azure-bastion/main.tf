@@ -2,7 +2,7 @@ terraform {
   # BUG(medium) no locking
   backend "s3" {
     bucket = "terraform.aws.jeremychase.io"
-    key    = "live/mgmt/services/azure-calico"
+    key    = "live/mgmt/services/azure-bastion"
     region = "us-east-1"
   }
 
@@ -80,33 +80,11 @@ resource "azurerm_network_interface" "internal" {
   }
 }
 
-resource "azurerm_network_security_group" "webserver" {
-  name                = "tls_webserver"
-  location            = azurerm_resource_group.main.location
-  resource_group_name = azurerm_resource_group.main.name
-  security_rule {
-    access                     = "Allow"
-    direction                  = "Inbound"
-    name                       = "tls"
-    priority                   = 100
-    protocol                   = "Tcp"
-    source_port_range          = "*"
-    source_address_prefix      = "*"
-    destination_port_range     = "443"
-    destination_address_prefix = azurerm_network_interface.main.private_ip_address
-  }
-}
-
-resource "azurerm_network_interface_security_group_association" "main" {
-  network_interface_id      = azurerm_network_interface.internal.id
-  network_security_group_id = azurerm_network_security_group.webserver.id
-}
-
 resource "azurerm_linux_virtual_machine" "main" {
   name                            = "${var.prefix}-vm"
   resource_group_name             = azurerm_resource_group.main.name
   location                        = azurerm_resource_group.main.location
-  size                            = "Standard_D4s_v3"
+  size                            = "Standard_B1S"
   admin_username                  = var.adminuser
   disable_password_authentication = true
 
@@ -121,16 +99,16 @@ resource "azurerm_linux_virtual_machine" "main" {
   ]
 
   source_image_reference {
-    publisher = "Canonical"
-    offer     = "UbuntuServer"
-    sku       = "18.04-LTS"
+    publisher     = "Debian"
+    offer     = "debian-10"
+    sku       = "10"
     version   = "latest"
   }
 
   os_disk {
-    storage_account_type = "Standard_LRS"
+    storage_account_type = "StandardSSD_LRS"
     caching              = "ReadWrite"
-    disk_size_gb         = 128
+    disk_size_gb         = 64
   }
 }
 
@@ -150,7 +128,7 @@ resource "aws_route53_record" "pip_a" {
 
 resource "aws_route53_record" "short_cname" {
   zone_id = data.aws_route53_zone.selected.zone_id
-  name    = "calico.${var.zone_name}."
+  name    = "azure.${var.zone_name}."
   records = [
     aws_route53_record.pip_a.name,
   ]

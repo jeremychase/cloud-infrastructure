@@ -12,6 +12,7 @@ live/
 │   └── services
 │       ├── aws-bastion
 │       └── azure-calico
+│       └── azure-bastion
 │       └── gcp-free-tier-bastion
 └── prod
     └── services
