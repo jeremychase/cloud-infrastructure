@@ -11,6 +11,7 @@ live/
 │   │   └── aws-cloudtrail
 │   └── services
 │       ├── aws-bastion
+│       └── azure-calico
 │       └── gcp-free-tier-bastion
 └── prod
     └── services
