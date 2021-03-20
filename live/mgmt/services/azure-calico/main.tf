@@ -140,7 +140,7 @@ data "aws_route53_zone" "selected" {
 
 resource "aws_route53_record" "pip_a" {
   zone_id = data.aws_route53_zone.selected.zone_id
-  name    = "${var.location}.aws.${var.zone_name}."
+  name    = "${var.location}.azure.${var.zone_name}."
   records = [
     azurerm_public_ip.pip.ip_address,
   ]
