@@ -1,2 +1,0 @@
-apt-get update
-apt-get install -y tmux htop dnsutils python-pip curl vim figlet rsync git python3-boto3 python3-botocore python-backports.ssl-match-hostname python-backports-shutil-get-terminal-size silversearcher-ag tree whois awscli jq mosh wipe cloc linux-cpupower ansible zip apache2-utils siege

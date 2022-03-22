@@ -32,7 +32,7 @@ provider "google" {
 # BUG(low) check bill
 # BUG(low) split into module
 resource "google_compute_instance" "free" {
-  machine_type = "f1-micro"
+  machine_type = "e2-micro"
   name         = "free"
   zone         = "us-east1-b"
 
@@ -40,14 +40,14 @@ resource "google_compute_instance" "free" {
     auto_delete = true
 
     initialize_params {
-      image = "debian-cloud/debian-10"
+      image = "debian-cloud/debian-11"
       size  = 30
       type  = "pd-standard"
     }
   }
 
   metadata = {
-    startup-script = file("${path.module}/files/debian-10-startup.sh")
+    startup-script = file("${path.module}/files/debian-11-startup.sh")
   }
 
   network_interface {
@@ -63,7 +63,7 @@ resource "google_compute_instance" "free" {
   }
 
   lifecycle {
-    prevent_destroy = true
+    prevent_destroy = false
   }
 }
 
