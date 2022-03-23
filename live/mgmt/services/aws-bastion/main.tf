@@ -26,65 +26,66 @@ resource "aws_default_vpc" "default" {
 }
 
 resource "aws_security_group" "bastion" {
-    description = "Allow ssh"
-    egress      = [
-        {
-            cidr_blocks      = [
-                "0.0.0.0/0",
-            ]
-            description      = ""
-            from_port        = 0
-            ipv6_cidr_blocks = []
-            prefix_list_ids  = []
-            protocol         = "-1"
-            security_groups  = []
-            self             = false
-            to_port          = 0
-        },
-    ]
-    ingress     = [
-        {
-            cidr_blocks      = [
-                "0.0.0.0/0",
-            ]
-            description      = ""
-            from_port        = -1
-            ipv6_cidr_blocks = [
-                "::/0",
-            ]
-            prefix_list_ids  = []
-            protocol         = "icmp"
-            security_groups  = []
-            self             = false
-            to_port          = -1
-        },
-        {
-            cidr_blocks      = [
-                "0.0.0.0/0",
-            ]
-            description      = ""
-            from_port        = 22
-            ipv6_cidr_blocks = [
-                "::/0",
-            ]
-            prefix_list_ids  = []
-            protocol         = "tcp"
-            security_groups  = []
-            self             = false
-            to_port          = 22
-        },
-    ]
-    name        = "bastion"
-    tags        = {}
-    vpc_id      = aws_default_vpc.default.id
+  description = "Allow ssh"
+  egress = [
+    {
+      cidr_blocks = [
+        "0.0.0.0/0",
+      ]
+      description      = ""
+      from_port        = 0
+      ipv6_cidr_blocks = []
+      prefix_list_ids  = []
+      protocol         = "-1"
+      security_groups  = []
+      self             = false
+      to_port          = 0
+    },
+  ]
+  ingress = [
+    {
+      cidr_blocks = [
+        "0.0.0.0/0",
+      ]
+      description = ""
+      from_port   = -1
+      ipv6_cidr_blocks = [
+        "::/0",
+      ]
+      prefix_list_ids = []
+      protocol        = "icmp"
+      security_groups = []
+      self            = false
+      to_port         = -1
+    },
+    {
+      cidr_blocks = [
+        "0.0.0.0/0",
+      ]
+      description = ""
+      from_port   = 22
+      ipv6_cidr_blocks = [
+        "::/0",
+      ]
+      prefix_list_ids = []
+      protocol        = "tcp"
+      security_groups = []
+      self            = false
+      to_port         = 22
+    },
+  ]
+  name   = "bastion"
+  tags   = {}
+  vpc_id = aws_default_vpc.default.id
 
-    timeouts {}
+  timeouts {}
 }
 
 resource "aws_instance" "graviton" {
   ami           = "ami-0c582118883b46f4f" # us-east-1
-  instance_type = "t4g.micro"
-  key_name = "jchase-jeremychase-us-east-1"
+  instance_type = "t4g.small"
+  key_name      = "jchase-jeremychase-us-east-1"
+  ebs_optimized = true
 
   security_groups = [aws_security_group.bastion.name]
 
