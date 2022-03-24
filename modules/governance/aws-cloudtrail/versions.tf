@@ -4,5 +4,5 @@ terraform {
       source = "hashicorp/aws"
     }
   }
-  required_version = ">= 0.15" // BUG(medium) update to 1.0
+  required_version = ">= 1.0" // BUG(medium) update to 1.1
 }
