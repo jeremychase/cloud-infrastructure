@@ -11,9 +11,10 @@ live/
 │   │   └── aws-cloudtrail
 │   └── services
 │       ├── aws-bastion
-│       └── azure-calico
-│       └── azure-bastion
-│       └── gcp-free-tier-bastion
+│       ├── azure-bastion
+│       ├── azure-calico
+│       ├── gcp-free-tier-bastion
+│       └── gcp-gke
 └── prod
     └── services
         └── www-jeremychase-io
