@@ -25,7 +25,7 @@ provider "aws" {
 
 provider "google" {
   credentials = file(var.google_provider_credentials_path)
-  project     = "jeremychase-io"
+  project     = var.project_id
   region      = "us-east1"
 }
 
