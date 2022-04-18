@@ -9,7 +9,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "3.14.0"
+      version = "3.14.0" // TODO - upgrade
     }
   }
 }
@@ -82,10 +82,17 @@ resource "aws_security_group" "bastion" {
 }
 
 resource "aws_instance" "graviton" {
-  ami           = "ami-0c582118883b46f4f" # us-east-1
-  instance_type = "t4g.small"
+  # ami            = "ami-0c582118883b46f4f" # us-east-1 - arm64 Amazon Linux 2. 4.x kernel
+  #ami            = "ami-0b49a4a6e8e22fa16" # us-east-1 - arm64 Ubuntu 20.04 LTS. 5.11.x kernel
+  ami           = "ami-028c98d9274336455" # us-east-1 - arm64 Ubuntu 22.04 LTS. (Jammy) 5.?.x kernel
+  instance_type = "t4g.medium"
   key_name      = "jchase-jeremychase-us-east-1"
   ebs_optimized = true
+
+  root_block_device {
+    volume_size = 12
+    volume_type = "gp2" // TODO - upgrade to gp3 after upgrading aws provider
+  }
 
   security_groups = [aws_security_group.bastion.name]
 
