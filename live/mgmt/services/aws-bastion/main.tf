@@ -9,7 +9,7 @@ terraform {
   required_providers {
     aws = {
       source  = "hashicorp/aws"
-      version = "3.14.0" // TODO - upgrade
+      version = "~> 3.14"
     }
   }
 }
@@ -90,8 +90,8 @@ resource "aws_instance" "graviton" {
   ebs_optimized = true
 
   root_block_device {
-    volume_size = 12
-    volume_type = "gp2" // TODO - upgrade to gp3 after upgrading aws provider
+    volume_size = 16
+    volume_type = "gp3"
   }
 
   security_groups = [aws_security_group.bastion.name]
