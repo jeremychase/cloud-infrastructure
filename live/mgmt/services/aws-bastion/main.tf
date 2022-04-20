@@ -85,12 +85,12 @@ resource "aws_instance" "graviton" {
   # ami            = "ami-0c582118883b46f4f" # us-east-1 - arm64 Amazon Linux 2. 4.x kernel
   #ami            = "ami-0b49a4a6e8e22fa16" # us-east-1 - arm64 Ubuntu 20.04 LTS. 5.11.x kernel
   ami           = "ami-028c98d9274336455" # us-east-1 - arm64 Ubuntu 22.04 LTS. (Jammy) 5.?.x kernel
-  instance_type = "t4g.medium"
+  instance_type = "t4g.xlarge"
   key_name      = "jchase-jeremychase-us-east-1"
   ebs_optimized = true
 
   root_block_device {
-    volume_size = 16
+    volume_size = 20
     volume_type = "gp3"
   }
 
