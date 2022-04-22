@@ -82,7 +82,7 @@ resource "aws_security_group" "argocd_dev" {
 }
 
 resource "aws_instance" "argocd_dev" {
-  ami = "ami-04505e74c0741db8d" # us-east-1 Canonical, Ubuntu, 20.04 LTS, amd64 focal image build on 2021-11-29
+  ami           = "ami-04505e74c0741db8d" # us-east-1 Canonical, Ubuntu, 20.04 LTS, amd64 focal image build on 2021-11-29
   instance_type = "t3a.large"
   key_name      = "jchase-jeremychase-us-east-1"
   ebs_optimized = true
@@ -96,6 +96,10 @@ resource "aws_instance" "argocd_dev" {
 
   credit_specification {
     cpu_credits = "unlimited"
+  }
+
+  tags = {
+    Name = "argocd-dev"
   }
 }
 

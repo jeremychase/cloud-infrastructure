@@ -81,10 +81,10 @@ resource "aws_security_group" "bastion" {
   timeouts {}
 }
 
-resource "aws_instance" "graviton" {
-  ami            = "ami-0c582118883b46f4f" # us-east-1 - arm64 Amazon Linux 2. 4.x kernel
+resource "aws_instance" "bastion" {
   #ami            = "ami-0b49a4a6e8e22fa16" # us-east-1 - arm64 Ubuntu 20.04 LTS. 5.11.x kernel
-  # ami           = "ami-028c98d9274336455" # us-east-1 - arm64 Ubuntu 22.04 LTS. (Jammy) 5.15.x kernel
+  #ami           = "ami-028c98d9274336455" # us-east-1 - arm64 Ubuntu 22.04 LTS. (Jammy) 5.15.x kernel
+  ami           = "ami-0c582118883b46f4f" # us-east-1 - arm64 Amazon Linux 2. 4.x kernel
   instance_type = "t4g.nano"
   key_name      = "jchase-jeremychase-us-east-1"
   ebs_optimized = true
@@ -99,10 +99,14 @@ resource "aws_instance" "graviton" {
   credit_specification {
     cpu_credits = "unlimited"
   }
+
+  tags = {
+    Name = "bastion"
+  }
 }
 
-resource "aws_eip" "graviton" {
-  instance = aws_instance.graviton.id
+resource "aws_eip" "bastion" {
+  instance = aws_instance.bastion.id
   vpc      = true
 }
 
@@ -114,7 +118,7 @@ resource "aws_route53_record" "eip_cname" {
   zone_id = data.aws_route53_zone.selected.zone_id
   name    = "us-east-1.aws.${var.zone_name}."
   records = [
-    aws_eip.graviton.public_dns,
+    aws_eip.bastion.public_dns,
   ]
   ttl  = 300
   type = "CNAME"
