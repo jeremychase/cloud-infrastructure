@@ -216,9 +216,9 @@ resource "aws_codepipeline" "www_jeremychase_io" {
 
       # BUG(medium) look for issue where cycling token causes CodePipeline to lose access to GitHub
       configuration = {
-        Owner      = "JeremyChase"
+        Owner      = "jeremychase"
         Repo       = "www.jeremychase.io"
-        Branch     = "master"
+        Branch     = "main"
         OAuthToken = var.github_personal_access_token
       }
     }
