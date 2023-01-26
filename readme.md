@@ -22,9 +22,13 @@ live/
 
 ## Setup
 
-### Terraform (required)
+Using the VSCode dev container is the reliable way to setup your system to use this repo.
 
-* Download binary and put it on your path.[<sup>*</sup>](https://www.terraform.io/downloads.html)
+1. Export AWS credentials
+1. Run `code`
+1. Open in container
+
+After the above, `terraform` should work as expected from the container terminal.
 
 ### AWS Provider credentials (required)
 
