@@ -11,3 +11,13 @@ variable "project_id" {
 variable "region" {
   default = "us-central1"
 }
+
+variable "zone_name" {
+  description = "The Route53 zone name."
+  default     = "jeremychase.io"
+}
+
+variable "argo_ingress_address" {
+  default = "34.172.61.78" # BUG(high) hard coded value
+  # Should match output of: k -n argocd get ingress argocd-server-ingress -o=jsonpath='{.status}'
+}

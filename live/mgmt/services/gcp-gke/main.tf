@@ -116,6 +116,21 @@ module "gke" {
   }
 }
 
+data "aws_route53_zone" "selected" {
+  name = "${var.zone_name}."
+}
+
+# BUG(high) setting this A record shouldn't be in this repo
+resource "aws_route53_record" "ingress" {
+  zone_id = data.aws_route53_zone.selected.zone_id
+  name    = "argocd.${var.zone_name}"
+  records = [
+    var.argo_ingress_address,
+  ]
+  ttl  = 86400
+  type = "A"
+}
+
 resource "google_compute_subnetwork" "gke" {
   name          = "gke"
   ip_cidr_range = "10.2.0.0/16"
