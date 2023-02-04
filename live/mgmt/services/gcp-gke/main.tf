@@ -55,7 +55,7 @@ module "gke" {
     {
       name           = "default-node-pool"
       machine_type   = "e2-small"
-      node_locations = "${var.region}-a"
+      node_locations = "${var.region}-a,${var.region}-b"
       # node_locations  = "${var.region}-a,${var.region}-b,${var.region}-f"
       min_count       = 1
       max_count       = 1
