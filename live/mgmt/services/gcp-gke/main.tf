@@ -116,21 +116,6 @@ module "gke" {
   }
 }
 
-data "aws_route53_zone" "selected" {
-  name = "${var.zone_name}."
-}
-
-# BUG(high) setting this A record shouldn't be in this repo
-resource "aws_route53_record" "ingress" {
-  zone_id = data.aws_route53_zone.selected.zone_id
-  name    = "argocd.${var.zone_name}"
-  records = [
-    var.argo_ingress_address,
-  ]
-  ttl  = 86400
-  type = "A"
-}
-
 resource "google_compute_subnetwork" "gke" {
   name          = "gke"
   ip_cidr_range = "10.2.0.0/16"
@@ -153,4 +138,30 @@ resource "google_compute_network" "gke" {
   name                    = "gke"
   auto_create_subnetworks = false
   project                 = var.project_id
+}
+
+# used with external-dns
+resource "google_service_account" "external-dns" {
+  account_id   = "external-dns"
+  display_name = "external-dns"
+}
+
+# used with external-dns
+resource "google_project_iam_binding" "project" {
+  project = var.project_id
+  role    = "roles/dns.admin"
+
+  members = [
+    "serviceAccount:${google_service_account.external-dns.email}",
+  ]
+}
+
+# used with external-dns
+resource "google_service_account_iam_binding" "external-dns" {
+  service_account_id = google_service_account.external-dns.id
+  role               = "roles/iam.workloadIdentityUser"
+
+  members = [
+    "serviceAccount:${var.project_id}.svc.id.goog[external-dns/external-dns]",
+  ]
 }

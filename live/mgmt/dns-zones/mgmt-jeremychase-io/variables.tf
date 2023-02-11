@@ -11,3 +11,13 @@ variable "project_id" {
 variable "region" {
   default = "us-central1"
 }
+
+variable "subdomain" {
+  description = "The subdomain."
+  default     = "mgmt"
+}
+
+variable "zone_name" {
+  description = "The Route53 zone name."
+  default     = "jeremychase.io"
+}
