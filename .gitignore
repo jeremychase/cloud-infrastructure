@@ -2,6 +2,7 @@
 .terraform
 *.tfstate
 terraform.tfvars
+.terraform.lock.hcl
 
 # build output
 build

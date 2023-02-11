@@ -32,5 +32,6 @@
 	"remoteUser": "vscode",
 	"features": {
 		"terraform": "1.0"
-	}
+	},
+	"postCreateCommand": "terraform -install-autocomplete"
 }
