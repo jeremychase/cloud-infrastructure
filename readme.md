@@ -24,34 +24,11 @@ live/
 
 Using the VSCode dev container is the reliable way to setup your system to use this repo.
 
-1. Export AWS credentials
-1. Run `code`
-1. Open in container
-
 After the above, `terraform` should work as expected from the container terminal.
 
 ### AWS Provider credentials (required)
 
-* Pass aws credentials:[<sup>*</sup>](https://www.terraform.io/docs/providers/aws/index.html#environment-variables)
-
-```
-#####################
-###   Use this    ###
-#####################
-export AWS_ACCESS_KEY_ID="an_access_key"
-export AWS_SECRET_ACCESS_KEY="a_secret_key"
-export AWS_DEFAULT_REGION="us-east-1"
-```
-
-```
-#####################
-### DOES NOT WORK ###
-#####################
-$ terraform version
-Terraform v0.12.20
-+ provider.aws v2.48.0
-$ export AWS_PROFILE=<profilename>
-```
+The `~/.aws/credentials` file needs to have the `jeremychase` profile.
 
 ## Directory and file structure
 
