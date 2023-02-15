@@ -84,7 +84,7 @@ resource "aws_security_group" "linkerd_dev" {
 resource "aws_instance" "linkerd_dev" {
   ami           = "ami-04505e74c0741db8d" # us-east-1 Canonical, Ubuntu, 20.04 LTS, amd64 focal image build on 2021-11-29
   instance_type = "t3a.medium"
-  key_name      = "jchase-jeremychase-us-east-1"
+  key_name      = "jchase-jeremychase-us-east-1-q1-2023"
   ebs_optimized = true
 
   root_block_device {
