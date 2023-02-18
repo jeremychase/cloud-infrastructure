@@ -15,7 +15,7 @@ terraform {
 }
 
 provider "aws" {
-  profile = "default"
+  profile = "jeremychase"
   region  = "us-east-1"
 }
 
@@ -26,7 +26,7 @@ resource "aws_default_vpc" "default" {
 }
 
 resource "aws_security_group" "bastion" {
-  description = "Allow ssh"
+  description = "bastion access"
   egress = [
     {
       cidr_blocks = [
@@ -47,7 +47,7 @@ resource "aws_security_group" "bastion" {
       cidr_blocks = [
         "0.0.0.0/0",
       ]
-      description = ""
+      description = "ping"
       from_port   = -1
       ipv6_cidr_blocks = [
         "::/0",
@@ -62,7 +62,7 @@ resource "aws_security_group" "bastion" {
       cidr_blocks = [
         "0.0.0.0/0",
       ]
-      description = ""
+      description = "ssh"
       from_port   = 22
       ipv6_cidr_blocks = [
         "::/0",
@@ -73,6 +73,22 @@ resource "aws_security_group" "bastion" {
       self            = false
       to_port         = 22
     },
+    {
+      cidr_blocks = [
+        "0.0.0.0/0",
+      ]
+      description = "mosh"
+      from_port   = 60000
+      to_port     = 61000
+      ipv6_cidr_blocks = [
+        "::/0",
+      ]
+      prefix_list_ids = []
+      protocol        = "udp"
+      security_groups = []
+      self            = false
+    },
+
   ]
   name   = "bastion"
   tags   = {}
@@ -84,7 +100,8 @@ resource "aws_security_group" "bastion" {
 resource "aws_instance" "bastion" {
   #ami            = "ami-0b49a4a6e8e22fa16" # us-east-1 - arm64 Ubuntu 20.04 LTS. 5.11.x kernel
   #ami           = "ami-028c98d9274336455" # us-east-1 - arm64 Ubuntu 22.04 LTS. (Jammy) 5.15.x kernel
-  ami           = "ami-0c582118883b46f4f" # us-east-1 - arm64 Amazon Linux 2. 4.x kernel
+  # ami           = "ami-0c582118883b46f4f" # us-east-1 - arm64 Amazon Linux 2. 4.x kernel
+  ami           = "ami-0e6694e5116a0086f" # us-east-1 - arm64 Debian 11 (20230124-1270)
   instance_type = "t4g.nano"
   key_name      = "jchase-jeremychase-us-east-1"
   ebs_optimized = true
