@@ -47,7 +47,7 @@ resource "aws_security_group" "linkerd_dev" {
       cidr_blocks = [
         "0.0.0.0/0",
       ]
-      description = ""
+      description = "ping"
       from_port   = -1
       ipv6_cidr_blocks = [
         "::/0",
@@ -62,7 +62,7 @@ resource "aws_security_group" "linkerd_dev" {
       cidr_blocks = [
         "0.0.0.0/0",
       ]
-      description = ""
+      description = "ssh"
       from_port   = 22
       ipv6_cidr_blocks = [
         "::/0",
@@ -72,6 +72,21 @@ resource "aws_security_group" "linkerd_dev" {
       security_groups = []
       self            = false
       to_port         = 22
+    },
+    {
+      cidr_blocks = [
+        "0.0.0.0/0",
+      ]
+      description = "mosh"
+      from_port   = 60000
+      to_port     = 61000
+      ipv6_cidr_blocks = [
+        "::/0",
+      ]
+      prefix_list_ids = []
+      protocol        = "udp"
+      security_groups = []
+      self            = false
     },
   ]
   name   = "linkerd_dev"
