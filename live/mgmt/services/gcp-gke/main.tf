@@ -53,29 +53,41 @@ module "gke" {
 
   node_pools = [
     {
-      name           = "default-node-pool"
-      machine_type   = "e2-small"
-      node_locations = "${var.region}-a" # Using one zone makes autoscaling granualirty easier.
-      # node_locations  = "${var.region}-a,${var.region}-b,${var.region}-f"
-      min_count       = 1
-      max_count       = 3
-      local_ssd_count = 0
-      disk_size_gb    = 10
-      disk_type       = "pd-standard"
-      image_type      = "COS_CONTAINERD"
-      auto_repair     = true
-      auto_upgrade    = true
-      # service_account    = "project-service-account@${var.project_id}.iam.gserviceaccount.com"
+      name               = "medium-worker-pool"
+      machine_type       = "e2-medium"
+      node_locations     = "${var.region}-a" # Using one zone makes autoscaling granualirty easier.
+      min_count          = 0
+      max_count          = 3
+      local_ssd_count    = 0
+      disk_size_gb       = 10
+      disk_type          = "pd-standard"
+      image_type         = "COS_CONTAINERD"
+      auto_repair        = true
+      auto_upgrade       = true
       preemptible        = false
       spot               = true
-      initial_node_count = 1
+      initial_node_count = 0
+    },
+    {
+      name               = "small-worker-pool"
+      machine_type       = "e2-small"
+      node_locations     = "${var.region}-a" # Using one zone makes autoscaling granualirty easier.
+      min_count          = 0
+      max_count          = 6
+      local_ssd_count    = 0
+      disk_size_gb       = 10
+      disk_type          = "pd-standard"
+      image_type         = "COS_CONTAINERD"
+      auto_repair        = true
+      auto_upgrade       = true
+      preemptible        = false
+      spot               = true
+      initial_node_count = 0
     },
   ]
 
   node_pools_oauth_scopes = {
-    all = []
-
-    default-node-pool = [
+    all = [
       "https://www.googleapis.com/auth/cloud-platform",
     ]
   }
@@ -83,25 +95,21 @@ module "gke" {
   node_pools_labels = {
     all = {}
 
-    default-node-pool = {
-      default-node-pool = true
+    medium-worker-pool = {
+      medium-worker-pool = true
     }
   }
 
   node_pools_metadata = {
     all = {}
-
-    default-node-pool = {
-      node-pool-metadata-custom-value = "my-node-pool"
-    }
   }
 
   node_pools_taints = {
     all = []
 
-    default-node-pool = [
+    medium-worker-pool = [
       {
-        key    = "default-node-pool"
+        key    = "medium-worker-pool"
         value  = true
         effect = "PREFER_NO_SCHEDULE"
       },
@@ -111,8 +119,8 @@ module "gke" {
   node_pools_tags = {
     all = []
 
-    default-node-pool = [
-      "default-node-pool",
+    medium-worker-pool = [
+      "medium-worker-pool",
     ]
   }
 }
