@@ -103,7 +103,7 @@ resource "aws_instance" "linkerd_dev" {
   ebs_optimized = true
 
   root_block_device {
-    volume_size = 30
+    volume_size = 60
     volume_type = "gp3"
   }
 
