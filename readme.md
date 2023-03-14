@@ -3,16 +3,16 @@
 This repository is used to manage my personal cloud infrastructure:
 
 ```
-live/
+live
 ├── mgmt
 │   ├── dns-zones
-│   │   └── jeremychase-io
+│   │   ├── jeremychase-io
+│   │   └── mgmt-jeremychase-io
 │   ├── governance
 │   │   └── aws-cloudtrail
 │   └── services
 │       ├── aws-bastion
 │       ├── azure-bastion
-│       ├── azure-calico
 │       ├── gcp-free-tier-bastion
 │       └── gcp-gke
 └── prod
